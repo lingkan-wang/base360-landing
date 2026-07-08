@@ -2,8 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>document.documentElement.classList.add('js')</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Base360 — Every conversation, every lead. One system.</title>
+<meta name="description" content="Base360 unifies every comment, DM, call and email into one inbox, with AI agents that reply, qualify and follow up until the sale closes.">
+<meta name="theme-color" content="#0A0B0E">
+<link rel="icon" href="assets/base360-logo.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Base360 — Every conversation, every lead. One system.">
+<meta property="og:description" content="One inbox for every channel. AI agents that turn a single comment into a closed customer.">
+<meta property="og:url" content="https://lingkan-wang.github.io/base360-landing/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -35,7 +44,7 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 body {
   background: var(--canvas);
   color: var(--text);
@@ -50,7 +59,7 @@ body {
 section { position: relative; }
 
 /* ---------- reveal on scroll ---------- */
-[data-reveal] {
+.js [data-reveal] {
   opacity: 0;
   transform: translateY(26px);
   transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
@@ -238,7 +247,7 @@ nav.scrolled {
 }
 
 /* ---------- hero (Linear-style: copy on top, full-width app panel below) ---------- */
-.hero { padding: 150px 0 90px; position: relative; }
+.hero { padding: 128px 0 76px; position: relative; }
 .hero::before {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(1000px 460px at 50% -100px, rgba(255, 255, 255, 0.05), transparent 70%);
@@ -272,13 +281,22 @@ nav.scrolled {
 .hero-new:hover svg { transform: translateX(3px); }
 
 /* hero app panel */
-.hero-stage { position: relative; margin-top: 64px; }
+.hero-stage { position: relative; margin-top: 44px; }
+.hero-stage::before {
+  content: ""; position: absolute; inset: -160px -220px -320px; pointer-events: none;
+  filter: blur(38px);
+  background: radial-gradient(52% 50% at 50% 58%,
+    rgba(120, 108, 246, 0.28) 0%,
+    rgba(99, 120, 248, 0.15) 30%,
+    rgba(99, 120, 248, 0.05) 52%,
+    transparent 78%);
+}
 .glow-cluster { position: absolute; inset: 0; pointer-events: none; }
 .glow-cluster i {
   position: absolute; border-radius: 50%; filter: blur(90px); display: block;
 }
-.hero-stage .g1 { width: 640px; height: 320px; right: 6%; top: -50px; background: var(--accent); opacity: 0.10; }
-.hero-stage .g2 { width: 400px; height: 250px; left: 3%; top: 40px; background: var(--accent); opacity: 0.055; }
+.hero-stage .g1 { width: 820px; height: 420px; left: calc(50% - 410px); top: 20px; background: var(--accent); opacity: 0.13; }
+.hero-stage .g2 { display: none; }
 .hero-stage .g3 { display: none; }
 @media (prefers-reduced-motion: no-preference) {
   .glow-cluster i { animation: breathe 6s ease-in-out infinite; }
@@ -292,7 +310,7 @@ nav.scrolled {
   display: grid; grid-template-columns: 232px minmax(0, 1fr) 300px;
   min-height: 552px;
   background: var(--card); border-radius: 20px; overflow: hidden;
-  box-shadow: 0 48px 100px -32px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 24px 54px -26px rgba(0, 0, 0, 0.72), 0 90px 160px -60px rgba(0, 0, 0, 0.88), 0 0 130px -8px rgba(112, 100, 242, 0.14);
 }
 .app-side {
   border-right: 1px solid var(--hair); padding: 14px 12px;
@@ -417,21 +435,20 @@ nav.scrolled {
 }
 
 /* ---------- logo strip ---------- */
-.logos { padding: 44px 0 76px; text-align: center; }
-.logos p { font-size: 13px; color: var(--sub); margin-bottom: 30px; }
-.marquee { overflow: hidden; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.marquee-track { display: flex; gap: 72px; width: max-content; padding: 4px 36px; }
+.logos { padding: 40px 0 84px; }
+.marquee { overflow: hidden; -webkit-mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+.marquee-track { display: flex; width: max-content; }
+.marquee-group { display: flex; align-items: center; gap: 72px; padding: 4px 36px; flex: none; }
 @media (prefers-reduced-motion: no-preference) {
-  .marquee-track { animation: slide 38s linear infinite; }
+  .marquee-track { animation: slide 90s linear infinite; }
   .marquee:hover .marquee-track { animation-play-state: paused; }
 }
 @keyframes slide { to { transform: translateX(-50%); } }
 .logo-item {
-  display: flex; align-items: center; gap: 8px; opacity: 0.4; color: #fff;
-  font-size: 15px; white-space: nowrap; transition: opacity 0.3s;
+  display: flex; align-items: center; opacity: 0.42; color: #fff;
+  white-space: nowrap; transition: opacity 0.3s;
 }
-.logo-item:hover { opacity: 0.75; }
-.logo-item .shape { flex: none; }
+.logo-item:hover { opacity: 0.85; }
 
 /* ---------- story ---------- */
 .story { padding: 110px 0 120px; }
@@ -475,30 +492,59 @@ nav.scrolled {
 .step.active p { color: var(--sub); }
 .hiw-stage {
   position: relative; min-height: 480px; overflow: hidden;
-  background: var(--card); border-radius: 20px;
+  background:
+    radial-gradient(120% 84% at 50% -14%, rgba(233, 238, 252, 0.06), transparent 52%),
+    linear-gradient(0deg, rgba(5, 6, 8, 0.55), transparent 44%),
+    var(--card);
+  border-radius: 20px;
 }
 .demo {
   position: absolute; inset: 0; display: grid; place-items: center; padding: 36px;
-  opacity: 0; transform: translateY(16px) scale(0.97);
-  transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+  opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(12px);
+  transition: opacity 0.38s ease, transform 0.38s ease, filter 0.38s ease;
   pointer-events: none;
 }
-.demo.active { opacity: 1; transform: none; pointer-events: auto; transition-delay: 0.08s; }
+.demo.active {
+  opacity: 1; transform: none; filter: blur(0); pointer-events: auto;
+  transition: opacity 0.7s var(--ease-out) 0.12s, transform 0.7s var(--ease-out) 0.12s, filter 0.62s var(--ease-out) 0.12s;
+}
+/* one-off specular sheen sweeping the pane on activation */
+.demo::after {
+  content: ""; position: absolute; top: -12%; bottom: -12%; left: 0; width: 34%;
+  background: linear-gradient(102deg, transparent 10%, rgba(233, 238, 252, 0.045) 44%, rgba(233, 238, 252, 0.085) 52%, rgba(233, 238, 252, 0.045) 60%, transparent 90%);
+  transform: translateX(-130%) skewX(-16deg); opacity: 0; pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .demo.active::after { animation: sheen 1.5s cubic-bezier(0.33, 0.35, 0.18, 1) 0.5s forwards; }
+}
+@keyframes sheen {
+  0% { opacity: 0; transform: translateX(-130%) skewX(-16deg); }
+  16% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(350%) skewX(-16deg); }
+}
 .demo-glow {
-  position: absolute; width: 340px; height: 260px; border-radius: 50%;
-  filter: blur(90px); background: var(--sc, var(--violet));
-  opacity: 0.13; top: 55%; left: 50%; transform: translate(-50%, -40%);
+  position: absolute; width: 360px; height: 270px; border-radius: 50%;
+  filter: blur(80px);
+  background: radial-gradient(closest-side, rgba(236, 240, 252, 0.55), rgba(91, 124, 250, 0.4) 46%, transparent 74%);
+  opacity: 0; top: 55%; left: 50%;
+  transform: translate(-50%, -34%) scale(0.8);
+  transition: opacity 1s var(--ease-out) 0.15s, transform 1.15s var(--ease-out) 0.15s;
   pointer-events: none;
 }
+.demo.active .demo-glow { opacity: 0.16; transform: translate(-50%, -42%) scale(1); }
+@media (prefers-reduced-motion: no-preference) {
+  .demo.active .demo-glow { animation: glowBreathe 7s ease-in-out 1.8s infinite; }
+}
+@keyframes glowBreathe { 50% { opacity: 0.115; transform: translate(-50%, -44%) scale(1.06); } }
 /* demo content lives directly in the stage: no inner card box */
-.demo { padding: 84px 56px 48px; }
+.demo { padding: 44px 52px; }
 .demo .ui-card {
   width: min(560px, 100%); position: static;
   background: none; border: 0; box-shadow: none; padding: 0; gap: 16px;
 }
 .demo .ui-card:hover { transform: none; }
 .demo .card-head {
-  position: absolute; top: 26px; left: 30px; right: 30px; font-size: 13px;
+  position: static; width: 100%; font-size: 13px;
 }
 .demo .card-head svg { width: 15px; height: 15px; }
 .demo .comment-body { font-size: 26px; letter-spacing: -0.01em; }
@@ -516,6 +562,65 @@ nav.scrolled {
 .demo .wave i { width: 5px; }
 .demo .call-quote { font-size: 16px; }
 .demo .email-subject { font-size: 18px; }
+
+/* staged entrance: children of the active pane resolve in sequence */
+.demo .ui-card > :not(.bubble-row) {
+  opacity: 0; transform: translateY(12px); filter: blur(7px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out), filter 0.6s var(--ease-out);
+}
+.demo.active .ui-card > :not(.bubble-row) { opacity: 1; transform: none; filter: blur(0); }
+.demo.active .ui-card > :nth-child(1) { transition-delay: 0.22s; }
+.demo.active .ui-card > :nth-child(2) { transition-delay: 0.34s; }
+.demo.active .ui-card > :nth-child(3) { transition-delay: 0.46s; }
+.demo.active .ui-card > :nth-child(4) { transition-delay: 0.62s; }
+
+/* scan-line reveal (demo 2): the ghost draft resolves into the reply as the line sweeps */
+.scan-wrap { position: relative; }
+.scan-ghost {
+  position: absolute; inset: 0; color: rgba(138, 143, 152, 0.55);
+  filter: blur(1.2px); pointer-events: none;
+}
+.scan-text { display: block; color: var(--text); }
+.demo .scan-text { clip-path: inset(0 100% 0 0); }
+.demo .scan-ghost { clip-path: inset(0 0 0 0); }
+.scan-line {
+  position: absolute; top: -13px; bottom: -7px; left: 0; width: 100%;
+  transform: translateX(-101%); opacity: 0; pointer-events: none;
+  border-right: 1.5px solid rgba(233, 238, 252, 0.85);
+  background: linear-gradient(90deg, transparent 78%, rgba(233, 238, 252, 0.06));
+  -webkit-mask: linear-gradient(180deg, #000 58%, rgba(0, 0, 0, 0.4) 86%, transparent);
+  mask: linear-gradient(180deg, #000 58%, rgba(0, 0, 0, 0.4) 86%, transparent);
+}
+.scan-line::before {
+  content: ""; position: absolute; top: -4px; right: -3.5px;
+  width: 5px; height: 5px; border-radius: 50%; background: #E9EEFC;
+  box-shadow: 0 0 10px 2px rgba(173, 196, 255, 0.7);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .demo.active .scan-line { animation: scanMove 1.4s cubic-bezier(0.5, 0.08, 0.25, 1) 1s forwards; }
+  .demo.active .scan-text { animation: scanShow 1.4s cubic-bezier(0.5, 0.08, 0.25, 1) 1s forwards; }
+  .demo.active .scan-ghost { animation: scanHide 1.4s cubic-bezier(0.5, 0.08, 0.25, 1) 1s forwards; }
+}
+@keyframes scanMove {
+  0% { opacity: 0; transform: translateX(-101%); }
+  7% { opacity: 1; }
+  93% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(0); }
+}
+@keyframes scanShow { to { clip-path: inset(0 0 0 0); } }
+@keyframes scanHide { to { clip-path: inset(0 0 0 101%); } }
+/* the meta line waits for the scan to finish, like the reference's completed state */
+.demo-scan.active .ui-card > .reply-meta { transition-delay: 2.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .demo { transform: none; filter: none; transition: opacity 0.3s ease; }
+  .demo.active { transition: opacity 0.3s ease; }
+  .demo::after { content: none; }
+  .demo .ui-card > :not(.bubble-row) { opacity: 1; transform: none; filter: none; transition: none; }
+  .demo-glow { transition: opacity 0.3s ease; transform: translate(-50%, -42%); }
+  .scan-ghost, .scan-line { display: none; }
+  .demo .scan-text { clip-path: none; }
+}
 
 .ui-card {
   width: 400px; max-width: 100%;
@@ -535,14 +640,6 @@ nav.scrolled {
 .comment-body { font-size: 17px; font-weight: 500; }
 .comment-meta { font-size: 12.5px; color: var(--sub); }
 .reply-body { font-size: 15px; line-height: 1.5; min-height: 66px; }
-.reply-body .caret {
-  display: inline-block; width: 1px; height: 1em; background: var(--violet-hi);
-  vertical-align: -2px; margin-left: 1px;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .demo.active .reply-body .caret { animation: blink 0.9s steps(1) infinite; }
-}
-@keyframes blink { 50% { opacity: 0; } }
 .reply-meta { font-size: 12.5px; font-weight: 500; color: var(--violet-hi); }
 
 .bubble-row { display: flex; }
@@ -550,20 +647,30 @@ nav.scrolled {
 .bubble {
   border-radius: 12px; padding: 10px 14px; font-size: 13.5px; line-height: 1.45;
   max-width: 270px;
-  opacity: 0; transform: translateY(12px) scale(0.97);
-  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--spring);
+  opacity: 0; transform: translateY(12px) scale(0.97); filter: blur(6px);
+  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--spring), filter 0.55s var(--ease-out);
   transition-delay: var(--d, 0s);
 }
-.demo.active .bubble { opacity: 1; transform: none; }
-.bubble.ai { background: rgba(91, 124, 250, 0.14); }
-.bubble.user { background: rgba(255, 255, 255, 0.07); }
+.demo.active .bubble { opacity: 1; transform: none; filter: blur(0); }
+.bubble.ai {
+  background: linear-gradient(180deg, rgba(120, 148, 252, 0.18), rgba(91, 124, 250, 0.10));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.bubble.user {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.055));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
 .product-mini {
   display: flex; align-items: center; gap: 10px; margin-top: 8px;
-  background: rgba(10, 11, 14, 0.7); border-radius: 9px; padding: 8px 12px 8px 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 58%), rgba(10, 11, 14, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 9px; padding: 8px 12px 8px 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 26px -16px rgba(0, 0, 0, 0.7);
 }
 .product-mini .thumb {
   width: 34px; height: 34px; border-radius: 7px; flex: none;
   background: linear-gradient(135deg, #D9C7AD, #8C7A66);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 .product-mini .pn { font-size: 12.5px; font-weight: 500; }
 .product-mini .pp { font-size: 11.5px; color: var(--sub); }
@@ -573,7 +680,8 @@ nav.scrolled {
 .avatar {
   width: 36px; height: 36px; border-radius: 50%; flex: none;
   display: grid; place-items: center; font-size: 12px; font-weight: 600;
-  background: #37426A; color: var(--violet-hi);
+  background: linear-gradient(180deg, #475589, #313C63); color: var(--violet-hi);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 18px -10px rgba(0, 0, 0, 0.8);
 }
 .crm-info .nm { font-size: 15px; font-weight: 600; }
 .crm-info .src { font-size: 12.5px; color: var(--sub); }
@@ -583,7 +691,8 @@ nav.scrolled {
   font-size: 11.5px; font-weight: 500; padding: 5px 10px; border-radius: 7px;
   border: 1px solid var(--hair); color: var(--sub);
   background: rgba(255, 255, 255, 0.05);
-  transition: all 0.4s var(--ease-out);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color 0.4s var(--ease-out), background 0.4s var(--ease-out), color 0.4s var(--ease-out);
   transition-delay: var(--d, 0s);
 }
 .demo.active .p-chip.on {
@@ -597,7 +706,7 @@ nav.scrolled {
   width: 4px; border-radius: 2px; height: var(--h);
   background: rgba(255, 255, 255, 0.18);
 }
-.wave i.on { background: var(--violet); }
+.wave i.on { background: linear-gradient(180deg, var(--violet-hi), var(--violet) 75%); }
 @media (prefers-reduced-motion: no-preference) {
   .demo.active .wave i.on {
     animation: eq 1.1s ease-in-out infinite;
@@ -612,9 +721,10 @@ nav.scrolled {
   font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px;
   white-space: nowrap;
   background: rgba(91, 124, 250, 0.15); color: var(--violet-hi);
-  transform: scale(0); opacity: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transform: scale(0.7); opacity: 0;
 }
-.demo.active .order-pill { animation: popIn 0.55s var(--spring) 0.5s forwards; }
+.demo.active .order-pill { animation: popIn 0.55s var(--spring) 1.05s forwards; }
 .order-note { font-size: 12.5px; color: var(--sub); }
 .divider { height: 1px; background: var(--hair); }
 .email-subject { font-size: 15px; font-weight: 500; }
@@ -962,8 +1072,8 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
 <header class="hero">
   <div class="wrap">
     <h1>
-      <span class="line"><span style="--d:.05s">Every conversation, every lead.</span></span>
-      <span class="line"><span class="accent" style="--d:.18s">One system.</span></span>
+      <span class="line"><span style="--d:.05s">Turn every comment and DM</span></span>
+      <span class="line"><span class="accent" style="--d:.18s">into a customer.</span></span>
     </h1>
     <div class="hero-meta">
       <div>
@@ -1025,8 +1135,7 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
 </header>
 
 <!-- ============ LOGOS ============ -->
-<section class="logos" data-reveal>
-  <p>Trusted by consumer brands</p>
+<section class="logos" data-reveal aria-label="Trusted by consumer brands">
   <div class="marquee">
     <div class="marquee-track" id="marqueeTrack"></div>
   </div>
@@ -1052,8 +1161,8 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
       </div>
       <div class="hiw-stage beam-card" id="hiwStage">
 
-      <!-- demo 1 -->
-      <div class="demo active" style="--sc:#5B7CFA">
+      <!-- demo 1 (activated by JS when the section scrolls into view, so the choreography is seen) -->
+      <div class="demo" style="--sc:#5B7CFA">
         <i class="demo-glow"></i>
           <div class="ui-card">
             <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> TikTok comment</div>
@@ -1062,12 +1171,16 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
           </div>
       </div>
 
-      <!-- demo 2 -->
-      <div class="demo" style="--sc:#5B7CFA">
+      <!-- demo 2: scan-line reveal, the ghost draft resolves into the finished reply -->
+      <div class="demo demo-scan" style="--sc:#5B7CFA">
         <i class="demo-glow"></i>
           <div class="ui-card">
             <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M10.3 13.7l4.86-4.85M20.11 5.9l-4.09 13.29c-.37 1.2-.55 1.79-.87 1.99a1 1 0 01-.91.08c-.34-.15-.62-.7-1.18-1.82l-2.59-5.19c-.09-.17-.13-.26-.19-.34a1 1 0 00-.18-.18c-.08-.06-.16-.1-.33-.19L4.57 10.94c-1.11-.56-1.67-.84-1.81-1.18a1 1 0 01.08-.91c.2-.32.79-.5 1.98-.87l13.3-4.09c.93-.29 1.4-.43 1.72-.32a1 1 0 01.6.6c.11.31-.03.78-.32 1.72z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Public reply</div>
-            <div class="reply-body"><span class="type-target" data-text="Hey Mia! The full ceramic set is $86 with free shipping. Just sent you the details."></span><span class="caret"></span></div>
+            <div class="reply-body scan-wrap">
+              <span class="scan-ghost" aria-hidden="true">Hey Mia! The full ceramic set is $86 with free shipping. Just sent you the details.</span>
+              <span class="scan-text">Hey Mia! The full ceramic set is $86 with free shipping. Just sent you the details.</span>
+              <i class="scan-line" aria-hidden="true"></i>
+            </div>
             <div class="reply-meta">Replied by your AI agent in 12 seconds</div>
           </div>
       </div>
@@ -1077,14 +1190,14 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
         <i class="demo-glow"></i>
           <div class="ui-card">
             <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M7.51 19.8A9 9 0 1021 12a9 9 0 00-16.8 4.49v.01c.07.13.11.19.13.25a.5.5 0 01.02.17c0 .06-.03.13-.07.26l-.77 2.3v.01c-.16.48-.24.73-.19.89a.5.5 0 00.3.3c.17.06.41-.02.9-.18l2.3-.77c.13-.04.2-.07.27-.07a.5.5 0 01.16.02c.06.02.13.05.25.13z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> TikTok DM</div>
-            <div class="bubble-row me"><div class="bubble ai" style="--d:.15s">
+            <div class="bubble-row me"><div class="bubble ai" style="--d:.4s">
               Here it is! Ceramic set in Sand or Sage, $86 for all four pieces.
               <div class="product-mini">
                 <div class="thumb"></div>
                 <div><div class="pn">Ceramic Dinner Set</div><div class="pp">$86 · ships free</div></div>
               </div>
             </div></div>
-            <div class="bubble-row"><div class="bubble user" style="--d:.75s">ok I want the sand one!!</div></div>
+            <div class="bubble-row"><div class="bubble user" style="--d:1.1s">ok I want the sand one!!</div></div>
           </div>
       </div>
 
@@ -1101,8 +1214,8 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
               <div class="score" data-count="92" data-plain>0</div>
             </div>
             <div class="chips">
-              <span class="p-chip on" style="--d:.2s">Captured</span>
-              <span class="p-chip on" style="--d:.5s">Qualified</span>
+              <span class="p-chip on" style="--d:.75s">Captured</span>
+              <span class="p-chip on" style="--d:1.1s">Qualified</span>
               <span class="p-chip">Call scheduled</span>
             </div>
           </div>
@@ -1532,31 +1645,25 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
 
   /* ---------- logo marquee ---------- */
   const LOGOS = [
-    ['◖', 'SOLSTICE', '600', '0.12em', '14px'],
-    ['◆', 'Casa Verde', '500', '0', '16px'],
-    ['▲', 'NOMAD', '600', '0.2em', '15px'],
-    ['●●', 'bloom', '300', '0', '18px'],
-    ['⬡', 'Atlas Cycles', '500', '0', '15px'],
+    ['SOLSTICE', '600', '0.12em', '14px'],
+    ['Casa Verde', '500', '0', '16px'],
+    ['NOMAD', '600', '0.2em', '15px'],
+    ['bloom', '300', '0', '18px'],
+    ['Atlas Cycles', '500', '0', '15px'],
+    ['MARLOW &amp; CO', '600', '0.14em', '13px'],
+    ['Ferne', '400', '0', '18px'],
+    ['OCHRE', '600', '0.22em', '14px'],
+    ['Wildgrain', '500', '0', '16px'],
   ];
   const track = document.getElementById('marqueeTrack');
-  track.innerHTML = [...LOGOS, ...LOGOS].map(([shape, name, w, ls, fs]) =>
-    `<span class="logo-item" style="font-weight:${w};letter-spacing:${ls};font-size:${fs}"><span class="shape">${shape}</span>${name}</span>`
+  const group = LOGOS.map(([name, w, ls, fs]) =>
+    `<span class="logo-item" style="font-weight:${w};letter-spacing:${ls};font-size:${fs}">${name}</span>`
   ).join('');
+  track.innerHTML =
+    `<div class="marquee-group">${group}${group}</div>` +
+    `<div class="marquee-group" aria-hidden="true">${group}${group}</div>`;
 
   /* ---------- story stages: node light-up + micro demos ---------- */
-  const typeTimers = new Set();
-  function typewriter(el) {
-    const full = el.dataset.text;
-    if (RM) { el.textContent = full; return; }
-    let i = 0;
-    const t = setInterval(() => {
-      i += 1 + (Math.random() > 0.7 ? 1 : 0);
-      el.textContent = full.slice(0, i);
-      if (i >= full.length) { clearInterval(t); typeTimers.delete(t); }
-    }, 26);
-    typeTimers.add(t);
-  }
-
   function countUp(el) {
     const target = parseFloat(el.dataset.count);
     const fmt = el.dataset.format || 'plain';
@@ -1590,9 +1697,6 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
   const hiwDemos = [...hiw.querySelectorAll('.demo')];
   let hiwCur = 0, hiwTimer = null, hiwHover = false, hiwInView = false, hiwBooted = false;
   function runMicro(demo) {
-    typeTimers.forEach((t) => clearInterval(t));
-    typeTimers.clear();
-    demo.querySelectorAll('.type-target').forEach((el) => { el.textContent = ''; typewriter(el); });
     demo.querySelectorAll('[data-count]').forEach(countUp);
   }
   function hiwActivate(i) {
@@ -1619,7 +1723,11 @@ footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
   hiw.addEventListener('pointerleave', () => { hiwHover = false; hiwSync(); });
   const hiwIO = new IntersectionObserver(([e]) => {
     hiwInView = e.isIntersecting;
-    if (hiwInView && !hiwBooted) { hiwBooted = true; runMicro(hiwDemos[0]); }
+    if (hiwInView && !hiwBooted) {
+      hiwBooted = true;
+      if (hiwCur === 0) hiwDemos[0].classList.add('active');
+      runMicro(hiwDemos[hiwCur]);
+    }
     hiwSync();
   }, { threshold: 0.3 });
   hiwIO.observe(hiw);
