@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base360 — Every conversation, every lead. One system.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --canvas: #0A0B0E;
+  --card: #0E1014;
+  --card-hi: #13151C;
+  --hair: rgba(255, 255, 255, 0.08);
+  --text: #F7F8F8;
+  --sub: #8A8F98;
+  --violet: #8B5CF6;
+  --violet-hi: #C4B5FD;
+  --magenta: #EC4899;
+  --orange: #FB923C;
+  --blue: #5B7CFA;
+  --light: #F4F4F5;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@property --beam-a {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--canvas);
+  color: var(--text);
+  font-family: 'Geist', -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+.mono { font-family: 'Geist Mono', monospace; }
+.wrap { max-width: 1440px; margin: 0 auto; padding: 0 min(120px, 8vw); }
+section { position: relative; }
+
+/* ---------- reveal on scroll ---------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+  transition-delay: var(--d, 0s);
+}
+[data-reveal].in { opacity: 1; transform: none; }
+
+/* ---------- nav ---------- */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition: background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+}
+nav.scrolled {
+  background: rgba(10, 11, 14, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: var(--hair);
+}
+.nav-inner {
+  position: relative;
+  height: 72px; display: flex; align-items: center; justify-content: space-between;
+  max-width: 1440px; margin: 0 auto; padding: 0 min(120px, 8vw);
+}
+.brand { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+.brand-mark {
+  width: 24px; height: 24px; overflow: hidden; border-radius: 50%; flex: none;
+}
+.brand-mark img { height: 100%; width: auto; display: block; }
+.brand-name { font-weight: 600; font-size: 17px; color: var(--text); letter-spacing: -0.01em; }
+.brand-name b { font-weight: 600; color: var(--blue); }
+.nav-links { display: flex; gap: 6px; align-items: center; }
+.nav-links > a {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: var(--sub); text-decoration: none; font-size: 14px; font-weight: 500;
+  padding: 8px 14px; border-radius: 999px;
+  transition: color 0.25s, background 0.25s;
+}
+.nav-links > a:hover, .nav-links > a.open {
+  color: var(--text); background: rgba(255, 255, 255, 0.06);
+}
+
+/* shared morphing dropdown panel */
+.nav-panel {
+  position: absolute; top: 58px; left: 0;
+  padding-top: 10px; /* hover bridge */
+  opacity: 0; transform: translateY(-8px) scale(0.98); transform-origin: 60px 0;
+  pointer-events: none; z-index: 60;
+  transition:
+    opacity 0.28s var(--ease-out),
+    transform 0.28s var(--ease-out),
+    left 0.38s var(--ease-out),
+    width 0.38s var(--ease-out),
+    height 0.38s var(--ease-out);
+}
+.nav-panel.show { opacity: 1; transform: none; pointer-events: auto; }
+.nav-panel.instant { transition: opacity 0.28s var(--ease-out), transform 0.28s var(--ease-out); }
+.nav-panel-box {
+  position: relative; width: 100%; height: 100%; overflow: hidden;
+  background: rgba(16, 18, 23, 0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--hair); border-radius: 16px;
+  box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.6);
+}
+.panel-sec {
+  position: absolute; top: 0; left: 0; padding: 10px;
+  opacity: 0; transform: translateX(var(--dir, 14px));
+  transition: opacity 0.24s var(--ease-out), transform 0.3s var(--ease-out);
+  pointer-events: none;
+}
+.panel-sec.active { opacity: 1; transform: none; pointer-events: auto; }
+.panel-sec[data-menu="product"] { width: 560px; }
+.panel-sec[data-menu="how"] { width: 340px; }
+.panel-sec[data-menu="pricing"] { width: 330px; }
+.panel-sec[data-menu="customers"] { width: 340px; }
+.sec-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; }
+.mega-feature {
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 5px;
+  padding: 16px; border-radius: 11px; text-decoration: none; min-height: 170px;
+  background:
+    linear-gradient(160deg, rgba(139, 92, 246, 0.16), rgba(236, 72, 153, 0.06) 60%, transparent),
+    rgba(255, 255, 255, 0.03);
+  transition: background 0.3s;
+}
+.mega-feature:hover { background:
+    linear-gradient(160deg, rgba(139, 92, 246, 0.22), rgba(236, 72, 153, 0.09) 60%, transparent),
+    rgba(255, 255, 255, 0.05); }
+.mf-glyph { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; margin-bottom: auto; }
+.mf-glyph img { height: 100%; width: auto; display: block; }
+.mf-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.mf-desc { font-size: 12px; color: var(--sub); line-height: 1.45; }
+.mega-links { display: flex; flex-direction: column; gap: 2px; }
+.mega-links a {
+  display: block; padding: 10px 12px; border-radius: 10px; text-decoration: none;
+  transition: background 0.25s;
+}
+.mega-links a:hover { background: rgba(255, 255, 255, 0.05); }
+.mega-links b { display: block; font-size: 13.5px; font-weight: 600; color: var(--text); }
+.mega-links span { display: block; font-size: 12px; color: var(--sub); margin-top: 2px; line-height: 1.4; }
+.nav-actions { display: flex; align-items: center; gap: 20px; }
+.nav-actions .signin { color: var(--sub); font-size: 14px; font-weight: 500; text-decoration: none; transition: color 0.25s; }
+.nav-actions .signin:hover { color: var(--text); }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; cursor: pointer; text-decoration: none;
+  font-family: inherit; font-weight: 600; letter-spacing: -0.01em;
+  border-radius: 999px;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.3s, background 0.3s;
+}
+.btn:active { transform: translateY(1px) scale(0.98); }
+.btn-primary {
+  background: var(--light); color: #0B0B0D;
+  padding: 10px 18px; font-size: 14px;
+}
+.btn-primary:hover { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08); }
+.btn-lg { padding: 14px 26px; font-size: 15px; }
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.04); color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 13px 24px; font-size: 15px;
+}
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.08); }
+
+/* ---------- border beam (replicating beam.jakubantalik.com: long comet tail,
+   bright head, crisp line layer + blurred bloom layer) ---------- */
+.beam-card { position: relative; border-radius: 20px; isolation: isolate; }
+.beam-card::before, .beam-card::after {
+  content: ""; position: absolute; inset: -1px; z-index: -1;
+  border-radius: inherit; pointer-events: none;
+  padding: 1.5px;
+  background: conic-gradient(from var(--beam-a, 0deg),
+    transparent 0%, transparent 54%,
+    rgba(139, 92, 246, 0.04) 60%,
+    rgba(139, 92, 246, 0.15) 66%,
+    rgba(139, 92, 246, 0.45) 72%,
+    rgba(180, 90, 220, 0.7) 77%,
+    rgba(236, 72, 153, 0.9) 81%,
+    rgba(251, 146, 60, 1) 84.5%,
+    rgba(255, 214, 170, 1) 85.6%,
+    transparent 86.4%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+.beam-card::after {
+  padding: 4px; inset: -2.5px;
+  filter: blur(9px) brightness(1.35) saturate(1.25);
+  opacity: 0.65;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .beam-card::before, .beam-card::after { animation: beamSpin 6.5s linear infinite; }
+}
+@keyframes beamSpin { to { --beam-a: 360deg; } }
+
+/* ---------- hero (Linear-style: copy on top, full-width app panel below) ---------- */
+.hero { padding: 150px 0 90px; position: relative; }
+.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(1000px 460px at 50% -100px, rgba(255, 255, 255, 0.05), transparent 70%);
+}
+.hero h1 {
+  font-size: clamp(42px, 4.7vw, 66px); font-weight: 600;
+  letter-spacing: -0.028em; line-height: 1.08; max-width: 980px;
+}
+.hero h1 .line { display: block; overflow: hidden; }
+.hero h1 .line span {
+  display: block; transform: translateY(110%);
+  animation: lineUp 0.9s var(--ease-out) forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes lineUp { to { transform: none; } }
+.hero h1 .accent { color: var(--violet-hi); }
+.hero-meta {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 32px; margin-top: 30px; flex-wrap: wrap;
+}
+.hero-sub { color: var(--sub); font-size: 18px; line-height: 1.55; max-width: 470px; }
+.hero-ctas { display: flex; gap: 14px; margin-top: 26px; }
+.hero-new {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--sub); font-size: 14.5px; text-decoration: none;
+  transition: color 0.25s; padding-bottom: 4px;
+}
+.hero-new b { color: var(--text); font-weight: 600; }
+.hero-new:hover { color: var(--text); }
+.hero-new svg { width: 14px; height: 14px; transition: transform 0.25s var(--ease-out); }
+.hero-new:hover svg { transform: translateX(3px); }
+
+/* hero app panel */
+.hero-stage { position: relative; margin-top: 64px; }
+.glow-cluster { position: absolute; inset: 0; pointer-events: none; }
+.glow-cluster i {
+  position: absolute; border-radius: 50%; filter: blur(90px); display: block;
+}
+.hero-stage .g1 { width: 320px; height: 240px; right: 2%; top: -60px; background: var(--violet); opacity: 0.16; }
+.hero-stage .g2 { width: 280px; height: 210px; right: -40px; top: 90px; background: var(--magenta); opacity: 0.12; }
+.hero-stage .g3 { width: 300px; height: 200px; left: -50px; top: -50px; background: var(--orange); opacity: 0.07; }
+@media (prefers-reduced-motion: no-preference) {
+  .glow-cluster i { animation: breathe 6s ease-in-out infinite; }
+  .glow-cluster .g2 { animation-delay: -2s; }
+  .glow-cluster .g3 { animation-delay: -4s; }
+}
+@keyframes breathe { 50% { opacity: 0.2; transform: scale(1.1); } }
+
+.hero-app {
+  position: relative;
+  display: grid; grid-template-columns: 232px minmax(0, 1fr) 300px;
+  min-height: 552px;
+  background: var(--card); border-radius: 20px; overflow: hidden;
+  box-shadow: 0 48px 100px -32px rgba(0, 0, 0, 0.65);
+}
+.app-side {
+  border-right: 1px solid var(--hair); padding: 14px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.ws {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  font-weight: 600; font-size: 13.5px; margin-bottom: 8px;
+}
+.ws .brand-mark { width: 20px; height: 20px; }
+.side-label {
+  font-size: 11px; color: rgba(138, 143, 152, 0.65);
+  padding: 12px 10px 6px; letter-spacing: 0.05em;
+}
+.side-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 10px; border-radius: 8px;
+  font-size: 13.5px; font-weight: 500; color: var(--sub);
+  transition: background 0.25s, color 0.25s;
+}
+.side-item svg { width: 15px; height: 15px; opacity: 0.75; flex: none; }
+.side-item.active { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+.side-item:hover { background: rgba(255, 255, 255, 0.04); }
+.side-item .count {
+  margin-left: auto; font-family: 'Geist Mono', monospace;
+  font-size: 11px; color: var(--sub);
+}
+.app-main { display: flex; flex-direction: column; min-width: 0; }
+.app-agent {
+  border-left: 1px solid var(--hair);
+  display: flex; flex-direction: column;
+  background: rgba(255, 255, 255, 0.015);
+}
+.agent-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 15px 16px; border-bottom: 1px solid var(--hair);
+  font-size: 13px; font-weight: 600;
+}
+.agent-head .live {
+  width: 7px; height: 7px; border-radius: 50%; flex: none;
+  background: var(--violet); box-shadow: 0 0 10px var(--violet);
+}
+.agent-head .mode {
+  margin-left: auto; font-size: 11px; font-weight: 500; color: var(--sub);
+  border: 1px solid var(--hair); border-radius: 999px; padding: 3px 9px;
+}
+.agent-log {
+  flex: 1; padding: 12px 14px; display: flex; flex-direction: column;
+  gap: 8px; overflow: hidden;
+}
+.log-item {
+  font-size: 12.5px; color: var(--sub); line-height: 1.45;
+  padding: 9px 11px; background: rgba(255, 255, 255, 0.035); border-radius: 9px;
+}
+.log-item b { color: var(--text); font-weight: 500; }
+.log-item.enter { animation: rowIn 0.55s var(--ease-out); }
+.agent-input {
+  margin: 10px 14px 14px; border: 1px solid var(--hair); border-radius: 10px;
+  padding: 10px 12px; display: flex; align-items: center; gap: 8px;
+  color: rgba(138, 143, 152, 0.7); font-size: 13px;
+  background: rgba(10, 11, 14, 0.5);
+}
+.agent-input .send {
+  margin-left: auto; width: 24px; height: 24px; border-radius: 50%; flex: none;
+  background: var(--violet); display: grid; place-items: center;
+}
+.agent-input .send svg { width: 11px; height: 11px; color: #fff; }
+.inbox-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 20px; border-bottom: 1px solid var(--hair);
+}
+.inbox-head h3 { font-size: 15px; font-weight: 600; }
+.inbox-head .spacer { flex: 1; }
+.chip {
+  font-size: 12px; font-weight: 500; color: var(--sub);
+  padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+.chip:hover { color: var(--text); }
+.chip.on { background: rgba(255, 255, 255, 0.09); color: var(--text); }
+.rows { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+.row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 15px 20px; border-bottom: 1px solid var(--hair);
+  height: 74px;
+}
+.row.enter { animation: rowIn 0.7s var(--ease-out); }
+@keyframes rowIn {
+  from { opacity: 0; transform: translateY(-16px); }
+}
+.row.leave {
+  transition: opacity 0.45s, transform 0.45s;
+  opacity: 0; transform: translateY(10px);
+}
+.row .ch {
+  width: 34px; height: 34px; flex: none; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  display: grid; place-items: center; color: rgba(255, 255, 255, 0.85);
+}
+.row .ch svg { width: 16px; height: 16px; }
+.row .msg { flex: 1; min-width: 0; }
+.row .msg .name { font-size: 14px; font-weight: 500; }
+.row .msg .snip {
+  font-size: 13px; color: var(--sub);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.badge {
+  font-size: 11px; font-weight: 500; padding: 4px 9px; border-radius: 999px;
+  background: rgba(139, 92, 246, 0.13); color: var(--violet-hi);
+  flex: none; transform: scale(0); opacity: 0;
+}
+.badge.neutral { background: rgba(255, 255, 255, 0.07); color: var(--sub); }
+.badge.pop { animation: popIn 0.5s var(--spring) forwards; }
+.badge.still { transform: none; opacity: 1; }
+@keyframes popIn { to { transform: scale(1); opacity: 1; } }
+.row .time { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--sub); flex: none; width: 26px; text-align: right; }
+
+.pill {
+  font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 999px;
+  background: rgba(139, 92, 246, 0.13); color: var(--violet-hi);
+}
+
+/* ---------- logo strip ---------- */
+.logos { padding: 44px 0 76px; text-align: center; }
+.logos p { font-size: 13px; color: var(--sub); margin-bottom: 30px; }
+.marquee { overflow: hidden; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+.marquee-track { display: flex; gap: 72px; width: max-content; padding: 4px 36px; }
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track { animation: slide 38s linear infinite; }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+}
+@keyframes slide { to { transform: translateX(-50%); } }
+.logo-item {
+  display: flex; align-items: center; gap: 8px; opacity: 0.4; color: #fff;
+  font-size: 15px; white-space: nowrap; transition: opacity 0.3s;
+}
+.logo-item:hover { opacity: 0.75; }
+.logo-item .shape { flex: none; }
+
+/* ---------- story ---------- */
+.story { padding: 110px 0 120px; }
+.story-head { text-align: center; max-width: 720px; margin: 0 auto 84px; }
+.eyebrow {
+  font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em;
+  color: var(--violet-hi); margin-bottom: 18px; display: block;
+}
+.story-head h2 { font-size: clamp(32px, 3.2vw, 46px); font-weight: 600; letter-spacing: -0.024em; }
+.story-head p { color: var(--sub); font-size: 17px; margin-top: 16px; }
+
+.hiw {
+  display: grid; grid-template-columns: 400px 1fr; gap: 56px;
+  align-items: stretch; max-width: 1160px; margin: 0 auto;
+}
+.hiw-steps { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.step {
+  position: relative; display: block; text-align: left; cursor: pointer;
+  background: none; border: 0; font: inherit; color: inherit;
+  padding: 15px 18px 15px 22px; border-radius: 12px;
+  transition: background 0.3s;
+}
+.step:hover { background: rgba(255, 255, 255, 0.03); }
+.step.active { background: rgba(255, 255, 255, 0.05); }
+.step::before {
+  content: ""; position: absolute; left: 6px; top: 16px; bottom: 16px; width: 2.5px;
+  border-radius: 2px; background: var(--sc, var(--violet));
+  opacity: 0; transform: scaleY(0.4);
+  transition: opacity 0.4s, transform 0.4s var(--ease-out);
+}
+.step.active::before { opacity: 1; transform: none; }
+.step h3 {
+  font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--sub); transition: color 0.3s;
+}
+.step p {
+  font-size: 13.5px; line-height: 1.5; margin-top: 4px;
+  color: rgba(138, 143, 152, 0.6); transition: color 0.3s;
+}
+.step.active h3 { color: var(--text); }
+.step.active p { color: var(--sub); }
+.hiw-stage {
+  position: relative; min-height: 480px; overflow: hidden;
+  background: var(--card); border-radius: 20px;
+}
+.demo {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 36px;
+  opacity: 0; transform: translateY(16px) scale(0.97);
+  transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+  pointer-events: none;
+}
+.demo.active { opacity: 1; transform: none; pointer-events: auto; transition-delay: 0.08s; }
+.demo-glow {
+  position: absolute; width: 340px; height: 260px; border-radius: 50%;
+  filter: blur(90px); background: var(--sc, var(--violet));
+  opacity: 0.13; top: 55%; left: 50%; transform: translate(-50%, -40%);
+  pointer-events: none;
+}
+/* demo content lives directly in the stage: no inner card box */
+.demo { padding: 84px 56px 48px; }
+.demo .ui-card {
+  width: min(560px, 100%); position: static;
+  background: none; border: 0; box-shadow: none; padding: 0; gap: 16px;
+}
+.demo .ui-card:hover { transform: none; }
+.demo .card-head {
+  position: absolute; top: 26px; left: 30px; right: 30px; font-size: 13px;
+}
+.demo .card-head svg { width: 15px; height: 15px; }
+.demo .comment-body { font-size: 26px; letter-spacing: -0.01em; }
+.demo .comment-meta { font-size: 14px; }
+.demo .reply-body { font-size: 18px; line-height: 1.55; min-height: 86px; }
+.demo .reply-meta { font-size: 13.5px; }
+.demo .bubble { font-size: 15px; max-width: 340px; padding: 12px 16px; }
+.demo .product-mini .thumb { width: 40px; height: 40px; }
+.demo .product-mini .pn { font-size: 13.5px; }
+.demo .crm-info .nm { font-size: 17px; }
+.demo .avatar { width: 42px; height: 42px; font-size: 13px; }
+.demo .score { font-size: 24px; }
+.demo .p-chip { font-size: 12.5px; padding: 6px 12px; }
+.demo .wave { height: 52px; }
+.demo .wave i { width: 5px; }
+.demo .call-quote { font-size: 16px; }
+.demo .email-subject { font-size: 18px; }
+
+.ui-card {
+  width: 400px; max-width: 100%;
+  background: var(--card); border: 1px solid var(--hair);
+  border-radius: 16px; padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  transition: transform 0.4s var(--ease-out), border-color 0.4s, box-shadow 0.4s;
+}
+.ui-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 44px -18px rgba(0, 0, 0, 0.6);
+}
+.card-head { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; color: var(--sub); }
+.card-head svg { width: 13px; height: 13px; opacity: 0.7; }
+.card-head .right { margin-left: auto; font-family: 'Geist Mono', monospace; }
+.comment-body { font-size: 17px; font-weight: 500; }
+.comment-meta { font-size: 12.5px; color: var(--sub); }
+.reply-body { font-size: 15px; line-height: 1.5; min-height: 66px; }
+.reply-body .caret {
+  display: inline-block; width: 1px; height: 1em; background: var(--violet-hi);
+  vertical-align: -2px; margin-left: 1px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .demo.active .reply-body .caret { animation: blink 0.9s steps(1) infinite; }
+}
+@keyframes blink { 50% { opacity: 0; } }
+.reply-meta { font-size: 12.5px; font-weight: 500; color: var(--violet-hi); }
+
+.bubble-row { display: flex; }
+.bubble-row.me { justify-content: flex-end; }
+.bubble {
+  border-radius: 12px; padding: 10px 14px; font-size: 13.5px; line-height: 1.45;
+  max-width: 270px;
+  opacity: 0; transform: translateY(12px) scale(0.97);
+  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--spring);
+  transition-delay: var(--d, 0s);
+}
+.demo.active .bubble { opacity: 1; transform: none; }
+.bubble.ai { background: rgba(139, 92, 246, 0.14); }
+.bubble.user { background: rgba(255, 255, 255, 0.07); }
+.product-mini {
+  display: flex; align-items: center; gap: 10px; margin-top: 8px;
+  background: rgba(10, 11, 14, 0.7); border-radius: 9px; padding: 8px 12px 8px 10px;
+}
+.product-mini .thumb {
+  width: 34px; height: 34px; border-radius: 7px; flex: none;
+  background: linear-gradient(135deg, #D9C7AD, #8C7A66);
+}
+.product-mini .pn { font-size: 12.5px; font-weight: 500; }
+.product-mini .pp { font-size: 11.5px; color: var(--sub); }
+
+.crm-top { display: flex; align-items: center; }
+.crm-person { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex: none;
+  display: grid; place-items: center; font-size: 12px; font-weight: 600;
+  background: #453F5E; color: var(--violet-hi);
+}
+.crm-info .nm { font-size: 15px; font-weight: 600; }
+.crm-info .src { font-size: 12.5px; color: var(--sub); }
+.score { margin-left: auto; font-family: 'Geist Mono', monospace; font-size: 20px; color: var(--violet-hi); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.p-chip {
+  font-size: 11.5px; font-weight: 500; padding: 5px 10px; border-radius: 7px;
+  border: 1px solid var(--hair); color: var(--sub);
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.4s var(--ease-out);
+  transition-delay: var(--d, 0s);
+}
+.demo.active .p-chip.on {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--violet-hi);
+}
+
+.wave { display: flex; align-items: center; gap: 4px; height: 40px; }
+.wave i {
+  width: 4px; border-radius: 2px; height: var(--h);
+  background: rgba(255, 255, 255, 0.18);
+}
+.wave i.on { background: var(--violet); }
+@media (prefers-reduced-motion: no-preference) {
+  .demo.active .wave i.on {
+    animation: eq 1.1s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.13s);
+  }
+}
+@keyframes eq { 50% { transform: scaleY(0.45); } }
+.call-quote { font-size: 13.5px; line-height: 1.45; }
+
+.order-line { display: flex; align-items: center; gap: 10px; }
+.order-pill {
+  font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px;
+  white-space: nowrap;
+  background: rgba(139, 92, 246, 0.15); color: var(--violet-hi);
+  transform: scale(0); opacity: 0;
+}
+.demo.active .order-pill { animation: popIn 0.55s var(--spring) 0.5s forwards; }
+.order-note { font-size: 12.5px; color: var(--sub); }
+.divider { height: 1px; background: var(--hair); }
+.email-subject { font-size: 15px; font-weight: 500; }
+
+.story-closing {
+  text-align: center; font-size: 22px; font-weight: 600; letter-spacing: -0.01em;
+  margin-top: 84px;
+}
+
+/* ---------- capabilities bento ---------- */
+.caps { padding: 40px 0 120px; }
+.caps-head h2 { font-size: clamp(30px, 2.9vw, 40px); font-weight: 600; letter-spacing: -0.024em; }
+.caps-head p { color: var(--sub); font-size: 16px; margin-top: 14px; }
+.bento { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+.bento-row { display: grid; gap: 16px; grid-column: 1 / -1; }
+.bento-row.a { grid-template-columns: 62fr 38fr; }
+.bento-row.b { grid-template-columns: 38fr 62fr; }
+.cell {
+  position: relative; overflow: hidden;
+  background: var(--card); border: 1px solid var(--hair);
+  border-radius: 20px; padding: 28px;
+  display: flex; flex-direction: column; gap: 20px;
+  transition: transform 0.4s var(--ease-out), border-color 0.4s;
+}
+.cell:hover { transform: translateY(-4px); border-color: rgba(255, 255, 255, 0.13); }
+.cell::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(139, 92, 246, 0.10), transparent 65%);
+  opacity: 0; transition: opacity 0.4s;
+}
+.cell:hover::after { opacity: 1; }
+.cell.tint {
+  background:
+    linear-gradient(155deg, rgba(139, 92, 246, 0.11), transparent 55%),
+    var(--card);
+}
+.cell h3 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.cell > p { color: var(--sub); font-size: 14.5px; line-height: 1.55; }
+.cell .fill { flex: 1; }
+.channel-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.cchip {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid var(--hair);
+  display: grid; place-items: center; color: rgba(255, 255, 255, 0.9);
+  transition: transform 0.3s var(--spring), background 0.3s;
+}
+.cchip:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.1); }
+.cchip svg { width: 20px; height: 20px; }
+.cchip.more { width: auto; padding: 0 14px; font-size: 13px; font-weight: 500; color: var(--sub); }
+.agent-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255, 255, 255, 0.04); border-radius: 10px;
+  padding: 10px 14px; font-size: 13.5px; font-weight: 500;
+}
+.agent-rows { display: flex; flex-direction: column; gap: 8px; }
+.agent-row > span:first-child { flex: 1; }
+.toggle {
+  width: 30px; height: 17px; border-radius: 999px; flex: none;
+  background: rgba(255, 255, 255, 0.15); position: relative; cursor: pointer;
+  transition: background 0.35s;
+}
+.toggle::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 13px; height: 13px; border-radius: 50%; background: var(--light);
+  transition: left 0.35s var(--spring);
+}
+.toggle.on { background: var(--violet); }
+.toggle.on::after { left: 15px; }
+.lead-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255, 255, 255, 0.04); border-radius: 10px;
+  padding: 10px 14px; font-size: 13.5px; font-weight: 500;
+}
+.lead-rows { display: flex; flex-direction: column; gap: 6px; }
+.lead-row > span:first-child { flex: 1; }
+.lead-row .src { flex: none; font-size: 12px; font-weight: 400; color: var(--sub); }
+.lead-row .sc { flex: none; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--violet-hi); }
+.stats-row { display: flex; gap: 48px; flex-wrap: wrap; }
+.stat .v { font-family: 'Geist Mono', monospace; font-size: 26px; font-weight: 500; }
+.stat .l { font-size: 13px; color: var(--sub); margin-top: 4px; }
+
+/* ---------- proof ---------- */
+.proof {
+  border-top: 1px solid var(--hair);
+  padding: 96px 0 110px;
+  display: grid; grid-template-columns: 1fr 360px; gap: 96px; align-items: center;
+  max-width: 1440px; margin: 0 auto; padding-left: min(120px, 8vw); padding-right: min(120px, 8vw);
+}
+.quote { font-size: 26px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; }
+.attr { display: flex; align-items: center; gap: 12px; margin-top: 28px; }
+.attr .avatar { background: #59422F; color: #F2DEC6; width: 40px; height: 40px; font-size: 13px; }
+.attr .who .n { font-size: 14px; font-weight: 600; }
+.attr .who .r { font-size: 13px; color: var(--sub); }
+.proof-stats .ps {
+  display: flex; align-items: center; gap: 16px; padding: 20px 0;
+}
+.proof-stats .ps + .ps { border-top: 1px solid var(--hair); }
+.proof-stats .pv {
+  font-family: 'Geist Mono', monospace; font-size: 30px; font-weight: 500;
+  color: var(--violet-hi); width: 110px; flex: none;
+}
+.proof-stats .pl { font-size: 14px; color: var(--sub); }
+
+/* ---------- faq ---------- */
+.faq { padding: 20px 0 130px; }
+.faq-head { text-align: center; margin-bottom: 44px; }
+.faq-head h2 { font-size: clamp(30px, 2.9vw, 40px); font-weight: 600; letter-spacing: -0.024em; }
+.faq-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+.qa {
+  position: relative; border-radius: 12px; overflow: hidden;
+  background: var(--card); isolation: isolate;
+  transition: margin 0.45s var(--ease-out), border-radius 0.45s, background 0.45s;
+}
+.qa.open { margin: 12px 0; border-radius: 16px; background: #16131d; }
+.qa-head {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 16px 18px; background: none; border: 0; cursor: pointer;
+  font-family: inherit; font-size: 14.5px; font-weight: 500; color: var(--text);
+  text-align: left;
+}
+.qa-head .qicon { width: 16px; height: 16px; opacity: 0.65; flex: none; }
+.qa-head span { flex: 1; }
+.qa-head .plus { position: relative; width: 12px; height: 12px; flex: none; transition: transform 0.4s var(--ease-out); }
+.qa-head .plus::before, .qa-head .plus::after {
+  content: ""; position: absolute; background: rgba(247, 248, 248, 0.8); border-radius: 1px;
+}
+.qa-head .plus::before { left: 5px; top: 0; width: 2px; height: 12px; }
+.qa-head .plus::after { left: 0; top: 5px; width: 12px; height: 2px; }
+.qa.open .plus { transform: rotate(45deg); }
+.qa-body {
+  position: relative; z-index: 2;
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows 0.5s var(--ease-out);
+}
+.qa.open .qa-body { grid-template-rows: 1fr; }
+.qa-inner { overflow: hidden; min-height: 0; }
+.qa-inner p {
+  padding: 0 46px 18px 46px; margin: 0;
+  font-size: 14px; line-height: 1.6; color: rgba(247, 248, 248, 0.86);
+}
+.qa .aurora {
+  position: absolute; inset: -45%; z-index: 1; pointer-events: none;
+  opacity: 0; transition: opacity 0.6s;
+  background:
+    radial-gradient(55% 75% at 12% 18%, rgba(139, 92, 246, 0.85), transparent 60%),
+    radial-gradient(48% 66% at 88% 26%, rgba(251, 146, 60, 0.8), transparent 62%),
+    radial-gradient(60% 60% at 55% 95%, rgba(236, 72, 153, 0.6), transparent 65%);
+  filter: blur(42px) saturate(1.2);
+}
+.qa.open .aurora { opacity: 0.42; }
+@media (prefers-reduced-motion: no-preference) {
+  .qa.open .aurora { animation: auroraDrift 9s ease-in-out infinite alternate; }
+}
+@keyframes auroraDrift {
+  to { transform: rotate(7deg) scale(1.18) translateX(4%); }
+}
+
+/* ---------- cta ---------- */
+.cta {
+  padding: 170px 0 180px; text-align: center; position: relative; overflow: hidden;
+}
+.cta .glow-cluster i { filter: blur(110px); }
+.cta .g1 { width: 340px; height: 260px; left: calc(50% - 300px); top: 30%; background: var(--violet); opacity: 0.17; }
+.cta .g2 { width: 300px; height: 240px; left: calc(50% + 20px); top: 42%; background: var(--magenta); opacity: 0.14; }
+.cta .g3 { width: 320px; height: 210px; left: calc(50% - 140px); top: 58%; background: var(--orange); opacity: 0.11; }
+.cta h2 { font-size: clamp(36px, 3.8vw, 54px); font-weight: 600; letter-spacing: -0.028em; }
+.cta p { color: var(--sub); font-size: 17px; margin-top: 18px; }
+.cta-btn-wrap {
+  display: inline-block; position: relative; margin-top: 34px;
+  border-radius: 999px;
+}
+.cta-btn-wrap.beam-card { border-radius: 999px; }
+.cta-btn-wrap::before { padding: 1.5px; inset: -2px; }
+.cta-btn-wrap::after { padding: 3px; inset: -3px; filter: blur(8px); }
+
+/* ---------- footer ---------- */
+footer { border-top: 1px solid var(--hair); padding: 64px 0 40px; }
+.foot-top { display: flex; justify-content: space-between; gap: 48px; flex-wrap: wrap; }
+.foot-brand .tag { font-size: 13px; color: var(--sub); margin-top: 12px; }
+.foot-cols { display: flex; gap: 72px; flex-wrap: wrap; }
+.foot-col h4 { font-size: 13px; font-weight: 500; margin-bottom: 14px; }
+.foot-col a {
+  display: block; font-size: 13px; color: var(--sub); text-decoration: none;
+  margin-bottom: 12px; transition: color 0.25s;
+}
+.foot-col a:hover { color: var(--text); }
+.foot-bottom {
+  display: flex; justify-content: space-between; gap: 24px;
+  margin-top: 48px; font-size: 12.5px; color: var(--sub);
+}
+.foot-bottom .legal { display: flex; gap: 24px; }
+.foot-bottom a { color: var(--sub); text-decoration: none; }
+.foot-bottom a:hover { color: var(--text); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1200px) {
+  .app-agent { display: none; }
+  .hero-app { grid-template-columns: 232px minmax(0, 1fr); }
+}
+@media (max-width: 1024px) {
+  .hero { padding-top: 130px; }
+  .app-side { display: none; }
+  .hero-app { grid-template-columns: 1fr; min-height: 480px; }
+  .hiw { grid-template-columns: 1fr; gap: 28px; }
+  .hiw-stage { min-height: 440px; }
+  .bento-row.a, .bento-row.b { grid-template-columns: 1fr; }
+  .proof { grid-template-columns: 1fr; gap: 48px; }
+  .nav-links { display: none; }
+}
+@media (max-width: 640px) {
+  .hero-ctas { flex-direction: column; align-items: flex-start; }
+  .ui-card { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#">
+      <span class="brand-mark"><img src="assets/base360-logo.png" onerror="this.onerror=null;this.src='https://base360.ai/wp-content/uploads/2025/09/base360logo-1.png'" alt="Base360"></span>
+      <span class="brand-name">base<b>360</b></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#caps" class="nav-trigger" data-menu="product">Product</a>
+      <a href="#how-it-works" class="nav-trigger" data-menu="how">How it works</a>
+      <a href="#faq" class="nav-trigger" data-menu="pricing">Pricing</a>
+      <a href="#proof" class="nav-trigger" data-menu="customers">Customers</a>
+    </div>
+    <div class="nav-panel" id="navPanel">
+      <div class="nav-panel-box">
+        <div class="panel-sec" data-menu="product">
+          <div class="sec-grid">
+            <a class="mega-feature" href="#caps">
+              <span class="mf-glyph"><img src="assets/base360-logo.png" onerror="this.onerror=null;this.src='https://base360.ai/wp-content/uploads/2025/09/base360logo-1.png'" alt=""></span>
+              <span class="mf-title">One customer record</span>
+              <span class="mf-desc">Inbox, agents, CRM and marketing in a single stack.</span>
+            </a>
+            <div class="mega-links">
+              <a href="#caps"><b>Inbox</b><span>Every comment, DM, call and email in one place.</span></a>
+              <a href="#how-it-works"><b>AI agents</b><span>Reply, qualify and follow up automatically.</span></a>
+              <a href="#caps"><b>CRM</b><span>Conversations become scored, workable leads.</span></a>
+              <a href="#caps"><b>Marketing</b><span>Newsletters and campaigns on the same record.</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="panel-sec" data-menu="how">
+          <div class="mega-links">
+            <a href="#how-it-works"><b>The full story</b><span>One TikTok comment, followed to a paid order.</span></a>
+            <a href="#how-it-works"><b>AI voice follow-ups</b><span>Hear how the agent closes details on a call.</span></a>
+            <a href="#caps"><b>Live inbox demo</b><span>Watch conversations get handled in real time.</span></a>
+          </div>
+        </div>
+        <div class="panel-sec" data-menu="pricing">
+          <div class="mega-links">
+            <a href="#faq"><b>Starter</b><span>Free. One channel, one AI agent.</span></a>
+            <a href="#faq"><b>Growth</b><span>$49/mo. Every channel, CRM and campaigns.</span></a>
+            <a href="#faq"><b>Scale</b><span>Custom. AI voice, SLAs and onboarding help.</span></a>
+          </div>
+        </div>
+        <div class="panel-sec" data-menu="customers">
+          <div class="mega-links">
+            <a href="#proof"><b>Aurea Skin</b><span>&ldquo;DMs turn into orders while we sleep.&rdquo;</span></a>
+            <a href="#proof"><b>Customer stories</b><span>How consumer brands run on Base360.</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a class="signin" href="#">Sign in</a>
+      <a class="btn btn-primary" href="#cta">Get started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <h1>
+      <span class="line"><span style="--d:.05s">Every conversation, every lead.</span></span>
+      <span class="line"><span class="accent" style="--d:.18s">One system.</span></span>
+    </h1>
+    <div class="hero-meta">
+      <div>
+        <p class="hero-sub" data-reveal style="--d:.4s">
+          Comments, DMs, calls and email in one inbox. AI agents reply, qualify
+          and follow up until the sale closes.
+        </p>
+        <div class="hero-ctas" data-reveal style="--d:.5s">
+          <a class="btn btn-primary btn-lg" href="#cta">Get started</a>
+          <a class="btn btn-ghost" href="#how-it-works">See how it works</a>
+        </div>
+      </div>
+      <a class="hero-new" href="#how-it-works" data-reveal style="--d:.6s">
+        <b>New</b> AI voice follow-ups
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="hero-stage" data-reveal style="--d:.55s">
+      <div class="glow-cluster"><i class="g1"></i><i class="g2"></i><i class="g3"></i></div>
+      <div class="hero-app beam-card" id="inboxPanel">
+
+        <aside class="app-side">
+          <div class="ws">
+            <span class="brand-mark"><img src="assets/base360-logo.png" onerror="this.onerror=null;this.src='https://base360.ai/wp-content/uploads/2025/09/base360logo-1.png'" alt=""></span>
+            base360
+          </div>
+          <div class="side-item active"><svg viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Inbox<span class="count">24</span></div>
+          <div class="side-item"><svg viewBox="0 0 24 24" fill="none"><path d="M19 21a7 7 0 10-14 0M12 11a4 4 0 110-8 4 4 0 010 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Leads<span class="count">8</span></div>
+          <div class="side-item"><svg viewBox="0 0 24 24" fill="none"><path d="M9.5 4.26A2 2 0 007.65 3H4.9A1.9 1.9 0 003 4.89 16.1 16.1 0 0019.1 21a1.9 1.9 0 001.9-1.9v-2.75a2 2 0 00-1.26-1.85l-2.64-1.05a2 2 0 00-2.02.32l-.68.57a2 2 0 01-2.7-.12l-1.91-1.92a2 2 0 01-.13-2.7l.57-.68a2 2 0 00.32-2.02L9.5 4.26z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Calls</div>
+          <div class="side-item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6l6.11 4.61c.68.5 1.02.75 1.39.85.33.08.67.08 1 0 .37-.1.71-.35 1.39-.85L20 6M3 15.8V8.2c0-1.12 0-1.68.22-2.1a2 2 0 01.87-.88C4.52 5 5.08 5 6.2 5h11.6c1.12 0 1.68 0 2.1.22a2 2 0 01.88.87c.22.43.22.99.22 2.1v7.61c0 1.12 0 1.68-.22 2.1a2 2 0 01-.87.88c-.43.22-.99.22-2.1.22H6.2c-1.12 0-1.68 0-2.1-.22a2 2 0 01-.88-.87C3 17.48 3 16.92 3 15.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Campaigns</div>
+          <div class="side-label">AGENTS</div>
+          <div class="side-item"><svg viewBox="0 0 24 24" fill="none"><path d="M15 19c0-2.21-2.69-4-6-4s-6 1.79-6 4M16.83 5.17a4 4 0 010 5.66M19 3a7.07 7.07 0 010 10M9 12a4 4 0 110-8 4 4 0 010 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Voice follow-up</div>
+          <div class="side-item"><svg viewBox="0 0 24 24" fill="none"><path d="M7.51 19.8A9 9 0 1021 12a9 9 0 00-16.8 4.49v.01c.07.13.11.19.13.25a.5.5 0 01.02.17c0 .06-.03.13-.07.26l-.77 2.3v.01c-.16.48-.24.73-.19.89a.5.5 0 00.3.3c.17.06.41-.02.9-.18l2.3-.77c.13-.04.2-.07.27-.07a.5.5 0 01.16.02c.06.02.13.05.25.13z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Comment responder</div>
+        </aside>
+
+        <main class="app-main">
+          <div class="inbox-head">
+            <h3>Inbox</h3>
+            <div class="spacer"></div>
+            <span class="chip on">All channels</span>
+            <span class="chip">Unassigned</span>
+            <span class="chip">AI handled</span>
+          </div>
+          <div class="rows" id="rows"></div>
+        </main>
+
+        <aside class="app-agent">
+          <div class="agent-head"><span class="live"></span>Agent<span class="mode">Auto</span></div>
+          <div class="agent-log" id="agentLog"></div>
+          <div class="agent-input">Tell the agent what to do next...
+            <span class="send"><svg viewBox="0 0 16 16" fill="none"><path d="M8 13V3M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LOGOS ============ -->
+<section class="logos" data-reveal>
+  <p>Trusted by consumer brands</p>
+  <div class="marquee">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+</section>
+
+<!-- ============ STORY ============ -->
+<section class="story" id="how-it-works">
+  <div class="wrap">
+    <div class="story-head" data-reveal>
+      <span class="eyebrow">HOW IT WORKS</span>
+      <h2>One comment becomes a customer.</h2>
+      <p>Follow a single TikTok comment through Base360, handled end to end by AI.</p>
+    </div>
+
+    <div class="hiw" id="hiw" data-reveal>
+      <div class="hiw-steps">
+        <button class="step active" style="--sc:#8B5CF6"><h3>A comment lands</h3><p>Friday, 11:42 PM. Nobody from your team is online.</p></button>
+        <button class="step" style="--sc:#8B5CF6"><h3>AI answers in public</h3><p>An on-brand reply in seconds, seen by everyone else in the comments.</p></button>
+        <button class="step" style="--sc:#EC4899"><h3>It moves to DMs</h3><p>The agent shares the set, answers her questions and takes the order forward.</p></button>
+        <button class="step" style="--sc:#EC4899"><h3>She becomes a lead</h3><p>Captured, scored and dropped into your pipeline. No copy-paste.</p></button>
+        <button class="step" style="--sc:#FB923C"><h3>AI voice closes the details</h3><p>A natural-sounding call confirms color, timing and delivery.</p></button>
+        <button class="step" style="--sc:#FB923C"><h3>Nurtured until she buys</h3><p>Email keeps her warm. Eleven days later, the order lands.</p></button>
+      </div>
+      <div class="hiw-stage beam-card" id="hiwStage">
+
+      <!-- demo 1 -->
+      <div class="demo active" style="--sc:#8B5CF6">
+        <i class="demo-glow"></i>
+          <div class="ui-card">
+            <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> TikTok comment</div>
+            <div class="comment-body">how much is this?</div>
+            <div class="comment-meta">@mia.koretz · on your fall drop video</div>
+          </div>
+      </div>
+
+      <!-- demo 2 -->
+      <div class="demo" style="--sc:#8B5CF6">
+        <i class="demo-glow"></i>
+          <div class="ui-card">
+            <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M10.3 13.7l4.86-4.85M20.11 5.9l-4.09 13.29c-.37 1.2-.55 1.79-.87 1.99a1 1 0 01-.91.08c-.34-.15-.62-.7-1.18-1.82l-2.59-5.19c-.09-.17-.13-.26-.19-.34a1 1 0 00-.18-.18c-.08-.06-.16-.1-.33-.19L4.57 10.94c-1.11-.56-1.67-.84-1.81-1.18a1 1 0 01.08-.91c.2-.32.79-.5 1.98-.87l13.3-4.09c.93-.29 1.4-.43 1.72-.32a1 1 0 01.6.6c.11.31-.03.78-.32 1.72z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Public reply</div>
+            <div class="reply-body"><span class="type-target" data-text="Hey Mia! The full ceramic set is $86 with free shipping. Just sent you the details."></span><span class="caret"></span></div>
+            <div class="reply-meta">Replied by your AI agent in 12 seconds</div>
+          </div>
+      </div>
+
+      <!-- demo 3 -->
+      <div class="demo" style="--sc:#EC4899">
+        <i class="demo-glow"></i>
+          <div class="ui-card">
+            <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M7.51 19.8A9 9 0 1021 12a9 9 0 00-16.8 4.49v.01c.07.13.11.19.13.25a.5.5 0 01.02.17c0 .06-.03.13-.07.26l-.77 2.3v.01c-.16.48-.24.73-.19.89a.5.5 0 00.3.3c.17.06.41-.02.9-.18l2.3-.77c.13-.04.2-.07.27-.07a.5.5 0 01.16.02c.06.02.13.05.25.13z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> TikTok DM</div>
+            <div class="bubble-row me"><div class="bubble ai" style="--d:.15s">
+              Here it is! Ceramic set in Sand or Sage, $86 for all four pieces.
+              <div class="product-mini">
+                <div class="thumb"></div>
+                <div><div class="pn">Ceramic Dinner Set</div><div class="pp">$86 · ships free</div></div>
+              </div>
+            </div></div>
+            <div class="bubble-row"><div class="bubble user" style="--d:.75s">ok I want the sand one!!</div></div>
+          </div>
+      </div>
+
+      <!-- demo 4 -->
+      <div class="demo" style="--sc:#EC4899">
+        <i class="demo-glow"></i>
+          <div class="ui-card">
+            <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M19 21a7 7 0 10-14 0M12 11a4 4 0 110-8 4 4 0 010 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> CRM <span class="right"></span><span class="pill" style="margin-left:auto">High intent</span></div>
+            <div class="crm-top">
+              <div class="crm-person">
+                <div class="avatar">MK</div>
+                <div class="crm-info"><div class="nm">Mia Koretz</div><div class="src">From TikTok comments</div></div>
+              </div>
+              <div class="score" data-count="92" data-plain>0</div>
+            </div>
+            <div class="chips">
+              <span class="p-chip on" style="--d:.2s">Captured</span>
+              <span class="p-chip on" style="--d:.5s">Qualified</span>
+              <span class="p-chip">Call scheduled</span>
+            </div>
+          </div>
+      </div>
+
+      <!-- demo 5 -->
+      <div class="demo" style="--sc:#FB923C">
+        <i class="demo-glow"></i>
+          <div class="ui-card">
+            <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M15 19c0-2.21-2.69-4-6-4s-6 1.79-6 4M16.83 5.17a4 4 0 010 5.66M19 3a7.07 7.07 0 010 10M9 12a4 4 0 110-8 4 4 0 010 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> AI voice call <span class="right">3:24</span></div>
+            <div class="wave" id="wave"></div>
+            <div class="call-quote">&ldquo;I can hold the Sand set for you until Sunday, want me to?&rdquo;</div>
+          </div>
+      </div>
+
+      <!-- demo 6 -->
+      <div class="demo" style="--sc:#FB923C">
+        <i class="demo-glow"></i>
+          <div class="ui-card">
+            <div class="card-head"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6l6.11 4.61c.68.5 1.02.75 1.39.85.33.08.67.08 1 0 .37-.1.71-.35 1.39-.85L20 6M3 15.8V8.2c0-1.12 0-1.68.22-2.1a2 2 0 01.87-.88C4.52 5 5.08 5 6.2 5h11.6c1.12 0 1.68 0 2.1.22a2 2 0 01.88.87c.22.43.22.99.22 2.1v7.61c0 1.12 0 1.68-.22 2.1a2 2 0 01-.87.88c-.43.22-.99.22-2.1.22H6.2c-1.12 0-1.68 0-2.1-.22a2 2 0 01-.88-.87C3 17.48 3 16.92 3 15.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Email · Day 4 of the welcome series</div>
+            <div class="email-subject">Your ceramic set, and how to care for it</div>
+            <div class="divider"></div>
+            <div class="order-line">
+              <span class="order-pill">Order #2841 · Paid</span>
+              <span class="order-note">11 days after her comment</span>
+            </div>
+          </div>
+      </div>
+
+      </div>
+    </div>
+
+    <p class="story-closing" data-reveal>No handoffs. No tabs. No one lifting a finger.</p>
+  </div>
+</section>
+
+<!-- ============ CAPABILITIES ============ -->
+<section class="caps" id="caps">
+  <div class="wrap">
+    <div class="caps-head" data-reveal>
+      <h2>Everything between a comment and a sale.</h2>
+      <p>Inbox, AI agents, CRM and marketing, built as one product on one customer record.</p>
+    </div>
+    <div class="bento">
+      <div class="bento-row a">
+        <div class="cell tint" data-reveal>
+          <div class="channel-chips">
+            <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M9.49 7H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 8.52 3 9.08 3 10.2v5.6c0 1.12 0 1.68.22 2.1a2 2 0 00.87.88c.43.22.99.22 2.1.22h11.61c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1v-5.61c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 7 18.92 7 17.8 7h-3.29m-5.02 0h.06-.06zm0 0c-.11 0-.17 0-.21-.01a1 1 0 01-.87-1.2c.01-.05.03-.12.08-.26.05-.15.08-.23.11-.3a2 2 0 011.7-1.22C10.37 4 10.45 4 10.61 4h2.78c.16 0 .24 0 .32.01a2 2 0 011.7 1.22c.03.07.05.15.1.3.05.14.07.21.08.26a1 1 0 01-.86 1.2c-.05.01-.11.01-.22.01m-4.9 0h4.9m0 0h.06-.06zM12 16a3 3 0 110-6 3 3 0 010 6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M9.5 4.26A2 2 0 007.65 3H4.9A1.9 1.9 0 003 4.89 16.1 16.1 0 0019.1 21a1.9 1.9 0 001.9-1.9v-2.75a2 2 0 00-1.26-1.85l-2.64-1.05a2 2 0 00-2.02.32l-.68.57a2 2 0 01-2.7-.12l-1.91-1.92a2 2 0 01-.13-2.7l.57-.68a2 2 0 00.32-2.02L9.5 4.26z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6l6.11 4.61c.68.5 1.02.75 1.39.85.33.08.67.08 1 0 .37-.1.71-.35 1.39-.85L20 6M3 15.8V8.2c0-1.12 0-1.68.22-2.1a2 2 0 01.87-.88C4.52 5 5.08 5 6.2 5h11.6c1.12 0 1.68 0 2.1.22a2 2 0 01.88.87c.22.43.22.99.22 2.1v7.61c0 1.12 0 1.68-.22 2.1a2 2 0 01-.87.88c-.43.22-.99.22-2.1.22H6.2c-1.12 0-1.68 0-2.1-.22a2 2 0 01-.88-.87C3 17.48 3 16.92 3 15.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="cchip more">+ SMS, calls &amp; more</span>
+          </div>
+          <div class="fill"></div>
+          <h3>One inbox for every channel</h3>
+          <p>Meta and TikTok comments, DMs, WhatsApp, SMS, calls and email. Reply to all of it without logging into a single platform.</p>
+        </div>
+        <div class="cell" data-reveal style="--d:.1s">
+          <div class="agent-rows">
+            <div class="agent-row"><span>Comment responder</span><span class="toggle" data-toggle></span></div>
+            <div class="agent-row"><span>Lead qualifier</span><span class="toggle" data-toggle></span></div>
+            <div class="agent-row"><span>Voice follow-up</span><span class="toggle" data-toggle></span></div>
+          </div>
+          <div class="fill"></div>
+          <h3>AI agents that do the work</h3>
+          <p>They reply, answer, qualify and follow up. You approve the playbook once.</p>
+        </div>
+      </div>
+      <div class="bento-row b">
+        <div class="cell" data-reveal>
+          <div class="lead-rows">
+            <div class="lead-row"><span>Mia Koretz</span><span class="src">TikTok</span><span class="sc">92</span></div>
+            <div class="lead-row"><span>Daniel Reyes</span><span class="src">WhatsApp</span><span class="sc">81</span></div>
+            <div class="lead-row"><span>Sofia Marchetti</span><span class="src">Email</span><span class="sc">77</span></div>
+          </div>
+          <div class="fill"></div>
+          <h3>A CRM that fills itself</h3>
+          <p>Every conversation becomes a scored lead your sales team can actually work.</p>
+        </div>
+        <div class="cell" data-reveal style="--d:.1s">
+          <div class="stats-row">
+            <div class="stat"><div class="v" data-count="12480" data-format="comma">0</div><div class="l">subscribers</div></div>
+            <div class="stat"><div class="v" data-count="62.4" data-format="pct">0%</div><div class="l">open rate</div></div>
+            <div class="stat"><div class="v" data-count="18.2" data-format="money">$0</div><div class="l">attributed revenue</div></div>
+          </div>
+          <div class="fill"></div>
+          <h3>Marketing on the same customer record</h3>
+          <p>Capture subscribers from your site, send newsletters and campaigns, and see sign-ups, opens and clicks next to every conversation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROOF ============ -->
+<section class="proof" id="proof">
+  <div data-reveal>
+    <div class="quote">&ldquo;We used to answer maybe half our comments. Now every single one gets a reply, and DMs turn into orders while we sleep.&rdquo;</div>
+    <div class="attr">
+      <div class="avatar">AO</div>
+      <div class="who"><div class="n">Amara Osei</div><div class="r">Founder, Aurea Skin</div></div>
+    </div>
+  </div>
+  <div class="proof-stats" data-reveal style="--d:.15s">
+    <div class="ps"><span class="pv" data-count="2.4" data-format="x">0x</span><span class="pl">more qualified leads from social</span></div>
+    <div class="ps"><span class="pv" data-count="94" data-format="pctInt">0%</span><span class="pl">of comments answered</span></div>
+    <div class="ps"><span class="pv" data-count="31" data-format="hrs">0 hrs</span><span class="pl">saved per week on replies</span></div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="faq-head" data-reveal>
+      <h2>Questions, answered.</h2>
+    </div>
+    <div class="faq-list" data-reveal>
+      <div class="qa open">
+        <button class="qa-head" type="button">
+          <svg class="qicon" viewBox="0 0 24 24" fill="none"><path d="M10.3 13.7l4.86-4.85M20.11 5.9l-4.09 13.29c-.37 1.2-.55 1.79-.87 1.99a1 1 0 01-.91.08c-.34-.15-.62-.7-1.18-1.82l-2.59-5.19c-.09-.17-.13-.26-.19-.34a1 1 0 00-.18-.18c-.08-.06-.16-.1-.33-.19L4.57 10.94c-1.11-.56-1.67-.84-1.81-1.18a1 1 0 01.08-.91c.2-.32.79-.5 1.98-.87l13.3-4.09c.93-.29 1.4-.43 1.72-.32a1 1 0 01.6.6c.11.31-.03.78-.32 1.72z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>How quickly can I start with Base360?</span>
+          <i class="plus"></i>
+        </button>
+        <div class="qa-body"><div class="qa-inner">
+          <p>Connect your channels in an afternoon, no engineering needed. Most brands see their first AI-handled conversation within the hour.</p>
+        </div></div>
+        <i class="aurora"></i>
+      </div>
+      <div class="qa">
+        <button class="qa-head" type="button">
+          <svg class="qicon" viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Which channels can I connect?</span>
+          <i class="plus"></i>
+        </button>
+        <div class="qa-body"><div class="qa-inner">
+          <p>Meta and TikTok comments and DMs, WhatsApp, SMS, phone calls, email and your website forms. Everything lands in the same inbox, on the same customer record.</p>
+        </div></div>
+        <i class="aurora"></i>
+      </div>
+      <div class="qa">
+        <button class="qa-head" type="button">
+          <svg class="qicon" viewBox="0 0 24 24" fill="none"><path d="M19 21a7 7 0 10-14 0M12 11a4 4 0 110-8 4 4 0 010 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Will Base360 help increase my revenue?</span>
+          <i class="plus"></i>
+        </button>
+        <div class="qa-body"><div class="qa-inner">
+          <p>That is the whole point. Every conversation becomes a tracked lead, high-intent buyers get flagged for sales, and nurture flows keep working after you log off. Brands on Base360 report 2.4x more qualified leads from social.</p>
+        </div></div>
+        <i class="aurora"></i>
+      </div>
+      <div class="qa">
+        <button class="qa-head" type="button">
+          <svg class="qicon" viewBox="0 0 24 24" fill="none"><path d="M15 19c0-2.21-2.69-4-6-4s-6 1.79-6 4M16.83 5.17a4 4 0 010 5.66M19 3a7.07 7.07 0 010 10M9 12a4 4 0 110-8 4 4 0 010 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>How much control do I have over the AI?</span>
+          <i class="plus"></i>
+        </button>
+        <div class="qa-body"><div class="qa-inner">
+          <p>You approve the playbook once: tone, offers, escalation rules. Agents reply, follow up and call inside those rails, and hand off to a human whenever confidence drops.</p>
+        </div></div>
+        <i class="aurora"></i>
+      </div>
+      <div class="qa">
+        <button class="qa-head" type="button">
+          <svg class="qicon" viewBox="0 0 24 24" fill="none"><path d="M7.51 19.8A9 9 0 1021 12a9 9 0 00-16.8 4.49v.01c.07.13.11.19.13.25a.5.5 0 01.02.17c0 .06-.03.13-.07.26l-.77 2.3v.01c-.16.48-.24.73-.19.89a.5.5 0 00.3.3c.17.06.41-.02.9-.18l2.3-.77c.13-.04.2-.07.27-.07a.5.5 0 01.16.02c.06.02.13.05.25.13z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Do you offer support if I get stuck?</span>
+          <i class="plus"></i>
+        </button>
+        <div class="qa-body"><div class="qa-inner">
+          <p>Real humans, ironically. Chat and email support on every plan, plus guided onboarding on Growth and up.</p>
+        </div></div>
+        <i class="aurora"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta" id="cta">
+  <div class="glow-cluster"><i class="g1"></i><i class="g2"></i><i class="g3"></i></div>
+  <div data-reveal>
+    <h2>Never miss another comment.</h2>
+    <p>Connect your channels in an afternoon and let the agents get to work.</p>
+    <span class="cta-btn-wrap beam-card">
+      <a class="btn btn-primary btn-lg" href="#">Get started</a>
+    </span>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="#">
+          <span class="brand-mark"><img src="assets/base360-logo.png" onerror="this.onerror=null;this.src='https://base360.ai/wp-content/uploads/2025/09/base360logo-1.png'" alt="Base360"></span>
+          <span class="brand-name" style="font-size:15px">base<b>360</b></span>
+        </a>
+        <div class="tag">One system for every conversation.</div>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>Product</h4>
+          <a href="#">Inbox</a><a href="#">AI agents</a><a href="#">CRM</a><a href="#">Marketing</a>
+        </div>
+        <div class="foot-col">
+          <h4>Company</h4>
+          <a href="#">About</a><a href="#">Customers</a><a href="#">Careers</a>
+        </div>
+        <div class="foot-col">
+          <h4>Resources</h4>
+          <a href="#">Docs</a><a href="#">Help center</a><a href="#">Changelog</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Base360</span>
+      <span class="legal"><a href="#">Privacy</a><a href="#">Terms</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- icons ---------- */
+  const IC = {
+    chat: '<svg viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    phone: '<svg viewBox="0 0 24 24" fill="none"><path d="M9.5 4.26A2 2 0 007.65 3H4.9A1.9 1.9 0 003 4.89 16.1 16.1 0 0019.1 21a1.9 1.9 0 001.9-1.9v-2.75a2 2 0 00-1.26-1.85l-2.64-1.05a2 2 0 00-2.02.32l-.68.57a2 2 0 01-2.7-.12l-1.91-1.92a2 2 0 01-.13-2.7l.57-.68a2 2 0 00.32-2.02L9.5 4.26z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    camera: '<svg viewBox="0 0 24 24" fill="none"><path d="M9.49 7H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 8.52 3 9.08 3 10.2v5.6c0 1.12 0 1.68.22 2.1a2 2 0 00.87.88c.43.22.99.22 2.1.22h11.61c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1v-5.61c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 7 18.92 7 17.8 7h-3.29m-5.02 0c-.11 0-.17 0-.21-.01a1 1 0 01-.87-1.2c.01-.05.03-.12.08-.26.05-.15.08-.23.11-.3a2 2 0 011.7-1.22C10.37 4 10.45 4 10.61 4h2.78c.16 0 .24 0 .32.01a2 2 0 011.7 1.22c.03.07.05.15.1.3.05.14.07.21.08.26a1 1 0 01-.86 1.2c-.05.01-.11.01-.22.01h-4.9zM12 16a3 3 0 110-6 3 3 0 010 6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    mail: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 6l6.11 4.61c.68.5 1.02.75 1.39.85.33.08.67.08 1 0 .37-.1.71-.35 1.39-.85L20 6M3 15.8V8.2c0-1.12 0-1.68.22-2.1a2 2 0 01.87-.88C4.52 5 5.08 5 6.2 5h11.6c1.12 0 1.68 0 2.1.22a2 2 0 01.88.87c.22.43.22.99.22 2.1v7.61c0 1.12 0 1.68-.22 2.1a2 2 0 01-.87.88c-.43.22-.99.22-2.1.22H6.2c-1.12 0-1.68 0-2.1-.22a2 2 0 01-.88-.87C3 17.48 3 16.92 3 15.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  };
+
+  /* ---------- reveal observer (one-shot, unobserved after fire) ---------- */
+  const revealIO = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        revealIO.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
+  document.querySelectorAll('[data-reveal]').forEach((el) => revealIO.observe(el));
+
+  /* ---------- nav scroll state (sentinel, no scroll listener) ---------- */
+  const sentinel = document.createElement('div');
+  sentinel.style.cssText = 'position:absolute;top:80px;height:1px;width:1px;';
+  document.body.prepend(sentinel);
+  const navIO = new IntersectionObserver(([e]) => {
+    document.getElementById('nav').classList.toggle('scrolled', !e.isIntersecting);
+  });
+  navIO.observe(sentinel);
+
+  /* ---------- live inbox feed ---------- */
+  const FEED = [
+    { ic: 'chat', name: '@mia.koretz', snip: 'how much is this?', badge: 'AI replied', accent: true, act: 'Replied to <b>@mia.koretz</b> on TikTok, sent pricing in a DM' },
+    { ic: 'phone', name: 'Daniel Reyes', snip: 'Can I switch my order to the ceramic set?', badge: 'AI handling', accent: true, act: 'Updated <b>Daniel Reyes</b>&rsquo; order and confirmed by SMS' },
+    { ic: 'camera', name: '@wanderplants', snip: 'Do you ship to Canada?', badge: 'AI replied', accent: true, act: 'Answered <b>@wanderplants</b> with shipping options' },
+    { ic: 'mail', name: 'Sofia Marchetti', snip: 'Re: Bulk order for our studio', badge: 'Sales', accent: false, act: 'Routed <b>Sofia Marchetti</b> to sales as a bulk lead' },
+    { ic: 'chat', name: '@jules.makes', snip: 'is the sage colorway back in stock?', badge: 'AI replied', accent: true, act: 'Told <b>@jules.makes</b> the Sage restock date, added to waitlist' },
+    { ic: 'phone', name: 'Priya Nair', snip: 'Voicemail · asking about bulk pricing', badge: 'AI handling', accent: true, act: 'Scheduled a voice follow-up with <b>Priya Nair</b>' },
+  ];
+  const rowsEl = document.getElementById('rows');
+  const logEl = document.getElementById('agentLog');
+  const AGE = ['2m', '5m', '11m', '24m', '31m', '1h'];
+  const badgeTimers = new Set();
+  const MAX_ROWS = 6;
+
+  function logAction(html) {
+    const li = document.createElement('div');
+    li.className = 'log-item enter';
+    li.innerHTML = html;
+    logEl.prepend(li);
+    while (logEl.children.length > 4) logEl.lastElementChild.remove();
+  }
+  // seed the agent log
+  [FEED[2].act, FEED[1].act, FEED[3].act].forEach((a) => logAction(a));
+
+  function rowHTML(d, ageIdx, still) {
+    return `
+      <div class="ch">${IC[d.ic]}</div>
+      <div class="msg"><div class="name">${d.name}</div><div class="snip">${d.snip}</div></div>
+      <span class="badge ${d.accent ? '' : 'neutral'} ${still ? 'still' : ''}">${d.badge}</span>
+      <span class="time">${AGE[ageIdx] || 'now'}</span>`;
+  }
+  function makeRow(d, ageIdx, still) {
+    const el = document.createElement('div');
+    el.className = 'row';
+    el.innerHTML = rowHTML(d, ageIdx, still);
+    return el;
+  }
+  // initial rows, badges visible
+  let feedIdx = 5;
+  FEED.slice(0, 5).forEach((d, i) => rowsEl.appendChild(makeRow(d, i, true)));
+
+  function retime() {
+    [...rowsEl.children].forEach((r, i) => {
+      const t = r.querySelector('.time');
+      if (t) t.textContent = i === 0 ? 'now' : AGE[i - 1] || AGE[AGE.length - 1];
+    });
+  }
+  function tick() {
+    const d = FEED[feedIdx % FEED.length];
+    feedIdx++;
+    const row = makeRow(d, -1, false);
+    row.classList.add('enter');
+    rowsEl.prepend(row);
+    // drop last row
+    const last = rowsEl.children[rowsEl.children.length - 1];
+    if (rowsEl.children.length > MAX_ROWS && last) {
+      last.classList.add('leave');
+      const t1 = setTimeout(() => { last.remove(); badgeTimers.delete(t1); }, 460);
+      badgeTimers.add(t1);
+    }
+    retime();
+    // badge pops after the "AI is typing" beat, agent log follows
+    const badge = row.querySelector('.badge');
+    const t2 = setTimeout(() => {
+      badge.classList.add('pop');
+      badgeTimers.delete(t2);
+      if (d.act) logAction(d.act);
+    }, 1300);
+    badgeTimers.add(t2);
+  }
+
+  let feedTimer = null;
+  let heroVisible = true;
+  function startFeed() {
+    if (RM || feedTimer !== null) return;
+    feedTimer = setInterval(tick, 4200);
+  }
+  function stopFeed() {
+    if (feedTimer !== null) { clearInterval(feedTimer); feedTimer = null; }
+    badgeTimers.forEach(clearTimeout);
+    badgeTimers.clear();
+  }
+  const heroIO = new IntersectionObserver(([e]) => {
+    heroVisible = e.isIntersecting;
+    if (heroVisible && !document.hidden) startFeed(); else stopFeed();
+  }, { threshold: 0.15 });
+  heroIO.observe(document.getElementById('inboxPanel'));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopFeed(); else if (heroVisible) startFeed();
+  });
+
+  /* ---------- logo marquee ---------- */
+  const LOGOS = [
+    ['◖', 'SOLSTICE', '600', '0.12em', '14px'],
+    ['◆', 'Casa Verde', '500', '0', '16px'],
+    ['▲', 'NOMAD', '600', '0.2em', '15px'],
+    ['●●', 'bloom', '300', '0', '18px'],
+    ['⬡', 'Atlas Cycles', '500', '0', '15px'],
+  ];
+  const track = document.getElementById('marqueeTrack');
+  track.innerHTML = [...LOGOS, ...LOGOS].map(([shape, name, w, ls, fs]) =>
+    `<span class="logo-item" style="font-weight:${w};letter-spacing:${ls};font-size:${fs}"><span class="shape">${shape}</span>${name}</span>`
+  ).join('');
+
+  /* ---------- story stages: node light-up + micro demos ---------- */
+  const typeTimers = new Set();
+  function typewriter(el) {
+    const full = el.dataset.text;
+    if (RM) { el.textContent = full; return; }
+    let i = 0;
+    const t = setInterval(() => {
+      i += 1 + (Math.random() > 0.7 ? 1 : 0);
+      el.textContent = full.slice(0, i);
+      if (i >= full.length) { clearInterval(t); typeTimers.delete(t); }
+    }, 26);
+    typeTimers.add(t);
+  }
+
+  function countUp(el) {
+    const target = parseFloat(el.dataset.count);
+    const fmt = el.dataset.format || 'plain';
+    const dur = 1200;
+    const render = (v) => {
+      switch (fmt) {
+        case 'comma': el.textContent = Math.round(v).toLocaleString('en-US'); break;
+        case 'pct': el.textContent = v.toFixed(1) + '%'; break;
+        case 'pctInt': el.textContent = Math.round(v) + '%'; break;
+        case 'money': el.textContent = '$' + v.toFixed(1) + 'k'; break;
+        case 'x': el.textContent = v.toFixed(1) + 'x'; break;
+        case 'hrs': el.textContent = Math.round(v) + ' hrs'; break;
+        default: el.textContent = Math.round(v);
+      }
+    };
+    if (RM) { render(target); return; }
+    const t0 = performance.now();
+    let raf;
+    const step = (now) => {
+      const p = Math.min(1, (now - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      render(target * eased);
+      if (p < 1) raf = requestAnimationFrame(step); else cancelAnimationFrame(raf);
+    };
+    raf = requestAnimationFrame(step);
+  }
+
+  /* how-it-works: hover steps on the left, demos switch on the right */
+  const hiw = document.getElementById('hiw');
+  const hiwSteps = [...hiw.querySelectorAll('.step')];
+  const hiwDemos = [...hiw.querySelectorAll('.demo')];
+  let hiwCur = 0, hiwTimer = null, hiwHover = false, hiwInView = false, hiwBooted = false;
+  function runMicro(demo) {
+    typeTimers.forEach((t) => clearInterval(t));
+    typeTimers.clear();
+    demo.querySelectorAll('.type-target').forEach((el) => { el.textContent = ''; typewriter(el); });
+    demo.querySelectorAll('[data-count]').forEach(countUp);
+  }
+  function hiwActivate(i) {
+    if (i === hiwCur) return;
+    hiwSteps[hiwCur].classList.remove('active');
+    hiwDemos[hiwCur].classList.remove('active');
+    hiwCur = i;
+    hiwSteps[hiwCur].classList.add('active');
+    hiwDemos[hiwCur].classList.add('active');
+    runMicro(hiwDemos[hiwCur]);
+  }
+  function hiwSync() {
+    const should = hiwInView && !hiwHover && !document.hidden && !RM;
+    if (should && hiwTimer === null) {
+      hiwTimer = setInterval(() => hiwActivate((hiwCur + 1) % hiwSteps.length), 4200);
+    }
+    if (!should && hiwTimer !== null) { clearInterval(hiwTimer); hiwTimer = null; }
+  }
+  hiwSteps.forEach((s, i) => {
+    s.addEventListener('pointerenter', () => hiwActivate(i));
+    s.addEventListener('click', () => hiwActivate(i));
+  });
+  hiw.addEventListener('pointerenter', () => { hiwHover = true; hiwSync(); });
+  hiw.addEventListener('pointerleave', () => { hiwHover = false; hiwSync(); });
+  const hiwIO = new IntersectionObserver(([e]) => {
+    hiwInView = e.isIntersecting;
+    if (hiwInView && !hiwBooted) { hiwBooted = true; runMicro(hiwDemos[0]); }
+    hiwSync();
+  }, { threshold: 0.3 });
+  hiwIO.observe(hiw);
+  document.addEventListener('visibilitychange', hiwSync);
+
+  /* ---------- waveform: build bars, play only while visible ---------- */
+  const wave = document.getElementById('wave');
+  const HEIGHTS = [8, 14, 22, 30, 18, 26, 34, 24, 12, 20, 32, 28, 16, 24, 36, 30, 20, 10, 16, 26, 22, 14, 18, 8];
+  wave.innerHTML = HEIGHTS.map((h, i) =>
+    `<i class="${i < 15 ? 'on' : ''}" style="--h:${h}px;--i:${i}"></i>`
+  ).join('');
+
+  /* ---------- toggles: flick on when revealed, clickable after ---------- */
+  const toggles = document.querySelectorAll('[data-toggle]');
+  const togIO = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) return;
+    toggles.forEach((t, i) => {
+      const tm = setTimeout(() => { t.classList.add('on'); badgeTimers.delete(tm); }, 350 + i * 220);
+      badgeTimers.add(tm);
+    });
+    togIO.disconnect();
+  }, { threshold: 0.5 });
+  togIO.observe(toggles[0]);
+  toggles.forEach((t) => t.addEventListener('click', () => t.classList.toggle('on')));
+
+  /* ---------- proof + bento stats ---------- */
+  const statIO = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      e.target.querySelectorAll('[data-count]:not([data-plain])').forEach(countUp);
+      statIO.unobserve(e.target);
+    }
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.proof-stats, .stats-row').forEach((el) => statIO.observe(el));
+
+  /* ---------- bento spotlight ---------- */
+  document.querySelectorAll('.cell').forEach((cell) => {
+    cell.addEventListener('pointermove', (ev) => {
+      const r = cell.getBoundingClientRect();
+      cell.style.setProperty('--mx', (ev.clientX - r.left) + 'px');
+      cell.style.setProperty('--my', (ev.clientY - r.top) + 'px');
+    });
+  });
+
+  /* ---------- nav: shared morphing dropdown ---------- */
+  const navInner = document.querySelector('.nav-inner');
+  const navPanel = document.getElementById('navPanel');
+  const triggers = [...document.querySelectorAll('.nav-trigger')];
+  const secs = {};
+  navPanel.querySelectorAll('.panel-sec').forEach((s) => { secs[s.dataset.menu] = s; });
+  let navOpen = false, activeMenu = null, closeTimer = null;
+
+  function openMenu(menu, trigger) {
+    if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    if (menu === activeMenu && navOpen) return;
+    const sec = secs[menu];
+    const innerRect = navInner.getBoundingClientRect();
+    const tRect = trigger.getBoundingClientRect();
+    const w = sec.offsetWidth;
+    const h = sec.offsetHeight;
+    let left = tRect.left - innerRect.left - 12;
+    left = Math.max(12, Math.min(left, innerRect.width - w - 12));
+    const prevLeft = parseFloat(navPanel.style.left) || left;
+    const dir = left >= prevLeft ? 16 : -16;
+
+    if (!navOpen) {
+      navPanel.classList.add('instant');
+      navPanel.style.left = left + 'px';
+      navPanel.style.width = w + 'px';
+      navPanel.style.height = (h + 10) + 'px';
+      void navPanel.offsetWidth;
+      navPanel.classList.remove('instant');
+      navPanel.classList.add('show');
+      navOpen = true;
+    } else {
+      navPanel.style.left = left + 'px';
+      navPanel.style.width = w + 'px';
+      navPanel.style.height = (h + 10) + 'px';
+    }
+    if (activeMenu && secs[activeMenu] !== sec) secs[activeMenu].classList.remove('active');
+    sec.style.setProperty('--dir', dir + 'px');
+    sec.classList.add('active');
+    triggers.forEach((t) => t.classList.toggle('open', t === trigger));
+    activeMenu = menu;
+  }
+  function closeMenu() {
+    navPanel.classList.remove('show');
+    triggers.forEach((t) => t.classList.remove('open'));
+    navOpen = false; activeMenu = null;
+  }
+  function scheduleClose() {
+    if (closeTimer) clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => { closeMenu(); closeTimer = null; }, 180);
+  }
+  triggers.forEach((t) => {
+    t.addEventListener('pointerenter', () => openMenu(t.dataset.menu, t));
+    t.addEventListener('click', closeMenu);
+  });
+  navPanel.addEventListener('pointerenter', () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } });
+  navPanel.addEventListener('pointerleave', scheduleClose);
+  navPanel.addEventListener('click', (e) => { if (e.target.closest('a')) closeMenu(); });
+  document.querySelector('.brand').addEventListener('pointerenter', scheduleClose);
+  document.querySelector('.nav-actions').addEventListener('pointerenter', scheduleClose);
+  navInner.addEventListener('pointerleave', scheduleClose);
+
+  /* ---------- FAQ accordion (open item detaches with aurora) ---------- */
+  const qas = [...document.querySelectorAll('.qa')];
+  qas.forEach((qa) => {
+    qa.querySelector('.qa-head').addEventListener('click', () => {
+      const isOpen = qa.classList.contains('open');
+      qas.forEach((q) => q.classList.remove('open'));
+      if (!isOpen) qa.classList.add('open');
+    });
+  });
+})();
+</script>
+</body>
+</html>
