@@ -972,24 +972,40 @@ nav.scrolled .nav-inner {
   background: #7997FF; color: #07080b; display: grid; place-items: center;
 }
 .af-check svg { width: 10px; height: 10px; }
+/* AI agent mascot: a little robot head that idle-bobs, blinks and pulses */
 .af-ai {
-  width: 54px; height: 54px; border-radius: 16px; flex: none;
-  background: #1F1F1F; border: 1px solid rgba(121, 151, 255, 0.35);
-  display: grid; place-items: center; color: #7997FF;
+  position: relative; width: 54px; height: 54px; border-radius: 16px; flex: none;
+  background: linear-gradient(180deg, #26272b, #17181b);
+  border: 1px solid rgba(121, 151, 255, 0.35);
+  display: grid; place-items: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
-.af-ai svg { width: 23px; height: 23px; }
+.bot { position: relative; display: grid; place-items: center; }
+.bot-ant { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+.bot-ant b { width: 1.5px; height: 6px; background: rgba(121, 151, 255, 0.5); display: block; }
+.bot-ant i { width: 5px; height: 5px; border-radius: 50%; background: #7997FF; display: block; box-shadow: 0 0 6px rgba(121, 151, 255, 0.9); }
+.bot-visor {
+  width: 30px; height: 20px; border-radius: 7px;
+  background: #0c0d10; border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.bot-visor i { width: 5px; height: 5px; border-radius: 50%; background: #7997FF; box-shadow: 0 0 5px rgba(121, 151, 255, 0.9); }
 @media (prefers-reduced-motion: no-preference) {
-  /* one combined list: a lone pulse rule would cancel the stagger's capIn
-     and leave the chip stuck at opacity 0 */
   .switch-panel.active .af-ai {
     animation:
       capIn 0.5s var(--ease-out) 0.2s forwards,
       aiPulse 2.4s ease-in-out 0.9s infinite;
   }
+  .switch-panel.active .bot { animation: botBob 2.6s ease-in-out 0.7s infinite; }
+  .switch-panel.active .bot-visor i { animation: botBlink 3.6s ease-in-out 1.2s infinite; }
+  .switch-panel.active .bot-ant i { animation: botTwinkle 2.6s ease-in-out 0.7s infinite; }
 }
 @keyframes aiPulse {
-  50% { box-shadow: 0 0 0 8px rgba(121, 151, 255, 0.08), 0 0 18px rgba(121, 151, 255, 0.25); }
+  50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 8px rgba(121, 151, 255, 0.07), 0 0 18px rgba(121, 151, 255, 0.22); }
 }
+@keyframes botBob { 0%, 100% { transform: translateY(0) rotate(0deg); } 30% { transform: translateY(-3px) rotate(-3deg); } 65% { transform: translateY(-1px) rotate(2deg); } }
+@keyframes botBlink { 0%, 42%, 48%, 100% { transform: scaleY(1); } 45% { transform: scaleY(0.15); } }
+@keyframes botTwinkle { 50% { opacity: 0.5; transform: scale(0.8); } }
 .af-arrow { color: rgba(255, 255, 255, 0.25); flex: none; }
 .af-arrow svg { width: 16px; height: 16px; display: block; }
 
@@ -1585,7 +1601,7 @@ footer { padding: 72px 0 40px; }
               </div>
               <span class="af-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
               <div class="af-step">
-                <span class="af-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 3.4 13 7.8 17.4 9.3 13 10.8 11.5 15.2 10 10.8 5.6 9.3 10 7.8z"/><path d="M18 13.5 18.7 15.6 20.8 16.3 18.7 17 18 19.1 17.3 17 15.2 16.3 17.3 15.6z"/></svg></span>
+                <span class="af-ai"><span class="bot"><span class="bot-ant"><b></b><i></i></span><span class="bot-visor"><i></i><i></i></span></span></span>
                 <span class="af-lab">AI drafts</span>
               </div>
               <span class="af-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
