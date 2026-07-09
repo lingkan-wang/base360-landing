@@ -625,6 +625,12 @@ nav.scrolled .nav-inner {
 }
 @keyframes ttBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 @keyframes ttGone { to { opacity: 0; } }
+.tt-ph { color: var(--sub-dim); }
+.demo.active .tt-ph {
+  animation:
+    ttGone 0.15s ease 0.45s forwards,
+    capIn 0.4s ease 2.3s forwards;
+}
 .tt-send {
   margin-left: auto; width: 26px; height: 26px; border-radius: 50%; flex: none;
   display: grid; place-items: center;
@@ -723,6 +729,7 @@ nav.scrolled .nav-inner {
   .demo .ui-card > :not(.bubble-row) { opacity: 1; transform: none; filter: none; transition: none; }
   .demo .tt-new { animation: none; opacity: 1; }
   .demo .tt-type, .demo .tt-caret { animation: none; display: none; }
+  .demo .tt-ph { animation: none; opacity: 1; }
   .demo .tt-send { animation: none; background: #5070FE; }
   .demo .tl-row { animation: none; opacity: 1; transform: none; }
   .demo .dm-ava { animation: none; opacity: 1; }
@@ -801,12 +808,6 @@ nav.scrolled .nav-inner {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: border-color 0.4s var(--ease-out), background 0.4s var(--ease-out), color 0.4s var(--ease-out);
   transition-delay: var(--d, 0s);
-}
-.demo.active .p-chip.on,
-.switch-panel.active .p-chip.on {
-  border-color: rgba(121, 151, 255, 0.4);
-  background: #1F1F1F;
-  color: #7997FF;
 }
 
 .wave { display: flex; align-items: center; gap: 4px; height: 40px; }
@@ -1384,6 +1385,7 @@ footer { padding: 72px 0 40px; }
             </div>
             <div class="tt-input">
               <i class="tt-type">how much is this?</i><i class="tt-caret" aria-hidden="true"></i>
+              <span class="tt-ph">Add comment&hellip;</span>
               <span class="tt-send"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 13V3M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             </div>
           </div>
