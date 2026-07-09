@@ -802,7 +802,8 @@ nav.scrolled .nav-inner {
   transition: border-color 0.4s var(--ease-out), background 0.4s var(--ease-out), color 0.4s var(--ease-out);
   transition-delay: var(--d, 0s);
 }
-.demo.active .p-chip.on {
+.demo.active .p-chip.on,
+.switch-panel.active .p-chip.on {
   border-color: rgba(121, 151, 255, 0.4);
   background: #1F1F1F;
   color: #7997FF;
@@ -907,49 +908,111 @@ nav.scrolled .nav-inner {
 @media (prefers-reduced-motion: reduce) {
   .switch-panel { transition-duration: 0.001ms; }
   .switch-panel.active .sp-stagger > *,
+  .switch-panel.active .attr-tip,
   .switch-panel.active .mini-bars i { animation: none; opacity: 1; transform: none; }
 }
-.channel-chips { display: flex; gap: 10px; flex-wrap: wrap; }
-.cchip {
-  width: 44px; height: 44px; border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06); border: 1px solid var(--hair);
-  display: grid; place-items: center; color: rgba(255, 255, 255, 0.9);
-  transition: transform 0.3s var(--spring), background 0.3s;
+/* abstract skeleton scenes for the four showcases:
+   converge -> pipeline -> conversion -> attribution */
+.sk-bar { display: block; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.85); }
+.sk-bar.dim { background: rgba(255, 255, 255, 0.12); }
+
+/* 1. channels converge into one thread */
+.cvg { display: flex; flex-direction: column; align-items: center; }
+.cvg-chips { display: flex; gap: 22px; }
+.cvg-chip {
+  width: 34px; height: 34px; border-radius: 10px; flex: none;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--hair-soft);
+  display: grid; place-items: center; color: var(--sub);
 }
-.cchip:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.1); }
-.cchip svg { width: 20px; height: 20px; }
-.cchip.more { width: auto; padding: 0 14px; font-size: 13px; font-weight: 500; color: var(--sub); }
-.agent-row {
+.cvg-chip svg { width: 16px; height: 16px; }
+.cvg-lines { display: block; width: 232px; height: 44px; margin: 2px 0; }
+.cvg-lines path { fill: none; stroke: rgba(255, 255, 255, 0.14); stroke-width: 1.2; }
+.cvg-win {
+  width: min(320px, 100%); border-radius: 12px; padding: 10px;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--hair-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  display: flex; flex-direction: column; gap: 7px;
+}
+.cvg-row {
   display: flex; align-items: center; gap: 10px;
-  background: rgba(255, 255, 255, 0.04); border-radius: 10px;
-  padding: 10px 14px; font-size: 13.5px; font-weight: 500;
+  padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.03);
 }
-.agent-rows { display: flex; flex-direction: column; gap: 8px; }
-.agent-row > span:first-child { flex: 1; }
-.toggle {
-  width: 30px; height: 17px; border-radius: 999px; flex: none;
-  background: rgba(255, 255, 255, 0.15); position: relative; cursor: pointer;
-  transition: background 0.35s;
+.cvg-row i { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); flex: none; }
+.cvg-row.hot { background: rgba(255, 255, 255, 0.06); }
+.cvg-row.hot i { background: #7997FF; box-shadow: 0 0 8px rgba(121, 151, 255, 0.7); }
+
+/* 2. incoming -> AI -> sent pipeline */
+.af { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 16px 0; }
+.af-bubble {
+  width: 100px; border-radius: 12px; padding: 13px 12px; flex: none;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid var(--hair-soft);
+  display: flex; flex-direction: column; gap: 7px;
 }
-.toggle::after {
-  content: ""; position: absolute; top: 2px; left: 2px;
-  width: 13px; height: 13px; border-radius: 50%; background: var(--light);
-  transition: left 0.35s var(--spring);
+.af-bubble.sent {
+  position: relative;
+  background: rgba(121, 151, 255, 0.1); border-color: rgba(121, 151, 255, 0.3);
 }
-.toggle.on { background: var(--violet); }
-.toggle.on::after { left: 15px; }
-.lead-row {
-  display: flex; align-items: center; gap: 10px;
-  background: rgba(255, 255, 255, 0.04); border-radius: 10px;
-  padding: 10px 14px; font-size: 13.5px; font-weight: 500;
+.af-check {
+  position: absolute; right: -7px; top: -7px; width: 18px; height: 18px; border-radius: 50%;
+  background: #7997FF; color: #07080b; display: grid; place-items: center;
 }
-.lead-rows { display: flex; flex-direction: column; gap: 6px; }
-.lead-row > span:first-child { flex: 1; }
-.lead-row .src { flex: none; font-size: 12px; font-weight: 400; color: var(--sub); }
-.lead-row .sc { flex: none; font-family: 'JetBrains Mono', Menlo, monospace; font-size: 13px; color: var(--violet-hi); }
+.af-check svg { width: 10px; height: 10px; }
+.af-ai {
+  width: 46px; height: 46px; border-radius: 14px; flex: none;
+  background: #1F1F1F; border: 1px solid rgba(121, 151, 255, 0.35);
+  display: grid; place-items: center; color: #7997FF;
+}
+.af-ai svg { width: 20px; height: 20px; }
+@media (prefers-reduced-motion: no-preference) {
+  /* one combined list: a lone pulse rule would cancel the stagger's capIn
+     and leave the chip stuck at opacity 0 */
+  .switch-panel.active .af-ai {
+    animation:
+      capIn 0.5s var(--ease-out) 0.2s forwards,
+      aiPulse 2.4s ease-in-out 0.9s infinite;
+  }
+}
+@keyframes aiPulse {
+  50% { box-shadow: 0 0 0 8px rgba(121, 151, 255, 0.08), 0 0 18px rgba(121, 151, 255, 0.25); }
+}
+.af-arrow { color: rgba(255, 255, 255, 0.25); flex: none; }
+.af-arrow svg { width: 16px; height: 16px; display: block; }
+
+/* 3. a conversation becomes a scored lead card */
+.cc { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px 0; }
+.cc-bubble {
+  width: 104px; border-radius: 12px 12px 12px 4px; padding: 13px 12px; flex: none;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--hair-soft);
+  display: flex; flex-direction: column; gap: 7px;
+}
+.cc-card {
+  width: min(232px, 58%); border-radius: 12px; padding: 14px;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid var(--hair-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+.cc-top { display: flex; align-items: center; gap: 10px; }
+.cc-ava { width: 30px; height: 30px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); flex: none; }
+.cc-bars { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.cc-score { font-family: var(--monospace-font); font-size: 20px; color: #7997FF; flex: none; }
+.cc-chips { display: flex; gap: 6px; margin-top: 12px; }
+
+/* 4. revenue attributed to a real customer */
 .stats-row { display: flex; gap: 48px; flex-wrap: wrap; }
-.stat .v { font-family: 'JetBrains Mono', Menlo, monospace; font-size: 26px; font-weight: 500; }
+.stat .v { font-family: var(--monospace-font); font-size: 26px; font-weight: 500; }
 .stat .l { font-size: 13px; color: var(--sub); margin-top: 4px; }
+.bars-wrap { position: relative; }
+.attr-tip {
+  position: absolute; right: 4px; top: -18px; z-index: 2;
+  display: flex; align-items: center; gap: 7px;
+  background: #16171B; border: 1px solid var(--hair);
+  border-radius: 8px; padding: 6px 10px;
+  font-size: 11.5px; color: var(--text);
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.8);
+  transform: scale(0.7); opacity: 0;
+}
+.switch-panel.active .attr-tip { animation: popIn 0.5s var(--spring) 0.9s forwards; }
+.attr-tip img { width: 16px; height: 16px; border-radius: 50%; object-fit: cover; }
+.attr-tip em { font-style: normal; color: #7997FF; font-family: var(--monospace-font); }
 
 /* ---------- proof: testimonial card grid, cards lift + tilt on hover ---------- */
 .proof { border-top: 1px solid var(--hair); padding: 112px 0; }
@@ -1467,56 +1530,75 @@ footer { padding: 72px 0 40px; }
 
     <div class="switch" data-reveal>
       <div class="switch-body">
-        <!-- Inbox -->
+        <!-- Inbox: channels converge into one thread -->
         <div class="switch-panel active" id="cap-panel-inbox" role="tabpanel" aria-labelledby="cap-tab-inbox">
           <div class="sp-demo">
             <div class="sp-demo-head"><span class="dot"></span> All channels, one place</div>
-            <div class="channel-chips sp-stagger">
-              <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M9.49 7H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 8.52 3 9.08 3 10.2v5.6c0 1.12 0 1.68.22 2.1a2 2 0 00.87.88c.43.22.99.22 2.1.22h11.61c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1v-5.61c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 7 18.92 7 17.8 7h-3.29m-5.02 0h.06-.06zm0 0c-.11 0-.17 0-.21-.01a1 1 0 01-.87-1.2c.01-.05.03-.12.08-.26.05-.15.08-.23.11-.3a2 2 0 011.7-1.22C10.37 4 10.45 4 10.61 4h2.78c.16 0 .24 0 .32.01a2 2 0 011.7 1.22c.03.07.05.15.1.3.05.14.07.21.08.26a1 1 0 01-.86 1.2c-.05.01-.11.01-.22.01m-4.9 0h4.9m0 0h.06-.06zM12 16a3 3 0 110-6 3 3 0 010 6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M9.5 4.26A2 2 0 007.65 3H4.9A1.9 1.9 0 003 4.89 16.1 16.1 0 0019.1 21a1.9 1.9 0 001.9-1.9v-2.75a2 2 0 00-1.26-1.85l-2.64-1.05a2 2 0 00-2.02.32l-.68.57a2 2 0 01-2.7-.12l-1.91-1.92a2 2 0 01-.13-2.7l.57-.68a2 2 0 00.32-2.02L9.5 4.26z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <span class="cchip"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6l6.11 4.61c.68.5 1.02.75 1.39.85.33.08.67.08 1 0 .37-.1.71-.35 1.39-.85L20 6M3 15.8V8.2c0-1.12 0-1.68.22-2.1a2 2 0 01.87-.88C4.52 5 5.08 5 6.2 5h11.6c1.12 0 1.68 0 2.1.22a2 2 0 01.88.87c.22.43.22.99.22 2.1v7.61c0 1.12 0 1.68-.22 2.1a2 2 0 01-.87.88c-.43.22-.99.22-2.1.22H6.2c-1.12 0-1.68 0-2.1-.22a2 2 0 01-.88-.87C3 17.48 3 16.92 3 15.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              <span class="cchip more">+ SMS &amp; more</span>
-            </div>
-            <div class="lead-rows sp-stagger">
-              <div class="lead-row"><span>New comment &middot; @mia.koretz</span><span class="src">TikTok</span></div>
-              <div class="lead-row"><span>&ldquo;Do you ship to Canada?&rdquo;</span><span class="src">WhatsApp</span></div>
-              <div class="lead-row"><span>Re: Bulk order for our studio</span><span class="src">Email</span></div>
+            <div class="cvg sp-stagger">
+              <div class="cvg-chips">
+                <span class="cvg-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M5.6 19.92l1.52-1.22c.32-.25.48-.38.66-.47.16-.08.33-.14.51-.18.2-.05.4-.05.82-.05h8.68c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1V7.2c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 4 18.92 4 17.8 4H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 5.52 3 6.08 3 7.2v11.47c0 1.07 0 1.6.22 1.87a1 1 0 00.78.38c.35 0 .77-.33 1.6-1z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="cvg-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M9.49 7H6.2c-1.12 0-1.68 0-2.1.22a2 2 0 00-.88.87C3 8.52 3 9.08 3 10.2v5.6c0 1.12 0 1.68.22 2.1a2 2 0 00.87.88c.43.22.99.22 2.1.22h11.61c1.12 0 1.68 0 2.1-.22a2 2 0 00.88-.87c.22-.43.22-.99.22-2.1v-5.61c0-1.12 0-1.68-.22-2.1a2 2 0 00-.87-.88C19.48 7 18.92 7 17.8 7h-3.29m-5.02 0h.06-.06zm0 0c-.11 0-.17 0-.21-.01a1 1 0 01-.87-1.2c.01-.05.03-.12.08-.26.05-.15.08-.23.11-.3a2 2 0 011.7-1.22C10.37 4 10.45 4 10.61 4h2.78c.16 0 .24 0 .32.01a2 2 0 011.7 1.22c.03.07.05.15.1.3.05.14.07.21.08.26a1 1 0 01-.86 1.2c-.05.01-.11.01-.22.01m-4.9 0h4.9m0 0h.06-.06zM12 16a3 3 0 110-6 3 3 0 010 6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="cvg-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M9.5 4.26A2 2 0 007.65 3H4.9A1.9 1.9 0 003 4.89 16.1 16.1 0 0019.1 21a1.9 1.9 0 001.9-1.9v-2.75a2 2 0 00-1.26-1.85l-2.64-1.05a2 2 0 00-2.02.32l-.68.57a2 2 0 01-2.7-.12l-1.91-1.92a2 2 0 01-.13-2.7l.57-.68a2 2 0 00.32-2.02L9.5 4.26z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="cvg-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6l6.11 4.61c.68.5 1.02.75 1.39.85.33.08.67.08 1 0 .37-.1.71-.35 1.39-.85L20 6M3 15.8V8.2c0-1.12 0-1.68.22-2.1a2 2 0 01.87-.88C4.52 5 5.08 5 6.2 5h11.6c1.12 0 1.68 0 2.1.22a2 2 0 01.88.87c.22.43.22.99.22 2.1v7.61c0 1.12 0 1.68-.22 2.1a2 2 0 01-.87.88c-.43.22-.99.22-2.1.22H6.2c-1.12 0-1.68 0-2.1-.22a2 2 0 01-.88-.87C3 17.48 3 16.92 3 15.8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <svg class="cvg-lines" viewBox="0 0 232 44" aria-hidden="true">
+                <path d="M32 0 C32 30 116 16 116 44"/>
+                <path d="M88 0 C88 26 116 22 116 44"/>
+                <path d="M144 0 C144 26 116 22 116 44"/>
+                <path d="M200 0 C200 30 116 16 116 44"/>
+              </svg>
+              <div class="cvg-win">
+                <div class="cvg-row hot"><i></i><span class="sk-bar" style="width:58%"></span></div>
+                <div class="cvg-row"><i></i><span class="sk-bar dim" style="width:44%"></span></div>
+                <div class="cvg-row"><i></i><span class="sk-bar dim" style="width:52%"></span></div>
+              </div>
             </div>
             <div class="fill"></div>
             <div class="sp-demo-foot">One thread per customer. <b>Zero tab-switching.</b></div>
           </div>
         </div>
 
-        <!-- AI agents -->
+        <!-- AI agents: incoming -> AI -> sent -->
         <div class="switch-panel" id="cap-panel-agents" role="tabpanel" aria-labelledby="cap-tab-agents">
           <div class="sp-demo">
             <div class="sp-demo-head"><span class="dot"></span> Agents on duty</div>
-            <div class="agent-rows sp-stagger">
-              <div class="agent-row"><span>Comment responder</span><span class="toggle" data-toggle></span></div>
-              <div class="agent-row"><span>Lead qualifier</span><span class="toggle" data-toggle></span></div>
-              <div class="agent-row"><span>Voice follow-up</span><span class="toggle" data-toggle></span></div>
+            <div class="af sp-stagger">
+              <div class="af-bubble"><span class="sk-bar dim" style="width:85%"></span><span class="sk-bar dim" style="width:55%"></span></div>
+              <span class="af-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="af-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 3.4 13 7.8 17.4 9.3 13 10.8 11.5 15.2 10 10.8 5.6 9.3 10 7.8z"/><path d="M18 13.5 18.7 15.6 20.8 16.3 18.7 17 18 19.1 17.3 17 15.2 16.3 17.3 15.6z"/></svg></span>
+              <span class="af-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div class="af-bubble sent">
+                <span class="sk-bar" style="width:80%"></span><span class="sk-bar" style="width:50%"></span>
+                <span class="af-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5 4.8 9 10 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
             </div>
             <div class="fill"></div>
-            <div class="sp-demo-foot">Working now, so you don&rsquo;t have to.</div>
+            <div class="sp-demo-foot">Reads, drafts and sends around the clock. <b>Inside your rails.</b></div>
           </div>
         </div>
 
-        <!-- CRM -->
+        <!-- CRM: a conversation becomes a scored lead card -->
         <div class="switch-panel" id="cap-panel-crm" role="tabpanel" aria-labelledby="cap-tab-crm">
           <div class="sp-demo">
-            <div class="sp-demo-head"><span class="dot"></span> Today&rsquo;s pipeline</div>
-            <div class="lead-rows sp-stagger">
-              <div class="lead-row"><span>Mia Koretz</span><span class="src">TikTok</span><span class="sc" data-count="92">0</span></div>
-              <div class="lead-row"><span>Daniel Reyes</span><span class="src">WhatsApp</span><span class="sc" data-count="81">0</span></div>
-              <div class="lead-row"><span>Sofia Marchetti</span><span class="src">Email</span><span class="sc" data-count="77">0</span></div>
+            <div class="sp-demo-head"><span class="dot"></span> From chat to lead</div>
+            <div class="cc sp-stagger">
+              <div class="cc-bubble"><span class="sk-bar dim" style="width:88%"></span><span class="sk-bar dim" style="width:60%"></span></div>
+              <span class="af-arrow"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div class="cc-card">
+                <div class="cc-top">
+                  <i class="cc-ava"></i>
+                  <div class="cc-bars"><span class="sk-bar" style="width:76px"></span><span class="sk-bar dim" style="width:52px"></span></div>
+                  <span class="cc-score" data-count="92">0</span>
+                </div>
+                <div class="cc-chips"><span class="p-chip on">Captured</span><span class="p-chip on">Qualified</span></div>
+              </div>
             </div>
             <div class="fill"></div>
-            <div class="sp-demo-foot"><b>3 new leads</b> scored while you read this.</div>
+            <div class="sp-demo-foot">Name, source and score. <b>Zero manual entry.</b></div>
           </div>
         </div>
 
-        <!-- Marketing -->
+        <!-- Marketing: revenue attributed to a real customer -->
         <div class="switch-panel" id="cap-panel-mkt" role="tabpanel" aria-labelledby="cap-tab-mkt">
           <div class="sp-demo">
             <div class="sp-demo-head"><span class="dot"></span> This month</div>
@@ -1525,8 +1607,11 @@ footer { padding: 72px 0 40px; }
               <div class="stat"><div class="v" data-count="62.4" data-format="pct">0%</div><div class="l">open rate</div></div>
               <div class="stat"><div class="v" data-count="18.2" data-format="money">$0</div><div class="l">attributed revenue</div></div>
             </div>
-            <div class="mini-bars" aria-hidden="true">
-              <i style="--i:0;--h:34%"></i><i style="--i:1;--h:50%"></i><i style="--i:2;--h:42%"></i><i style="--i:3;--h:66%"></i><i style="--i:4;--h:56%"></i><i style="--i:5;--h:80%"></i><i style="--i:6;--h:70%"></i><i style="--i:7;--h:92%"></i><i style="--i:8;--h:82%"></i><i style="--i:9;--h:100%"></i>
+            <div class="bars-wrap">
+              <div class="mini-bars" aria-hidden="true">
+                <i style="--i:0;--h:34%"></i><i style="--i:1;--h:50%"></i><i style="--i:2;--h:42%"></i><i style="--i:3;--h:66%"></i><i style="--i:4;--h:56%"></i><i style="--i:5;--h:80%"></i><i style="--i:6;--h:70%"></i><i style="--i:7;--h:92%"></i><i style="--i:8;--h:82%"></i><i style="--i:9;--h:100%"></i>
+              </div>
+              <div class="attr-tip"><img src="data:image/jpeg;base64,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" alt=""><span>Mia K.</span><em>$86</em></div>
             </div>
             <div class="fill"></div>
             <div class="sp-demo-foot">Every open tied back to a <b>real customer</b>.</div>
